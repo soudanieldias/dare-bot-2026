@@ -1,0 +1,38 @@
+{
+  "name": "dare-bot-2026",
+  "version": "1.0.0",
+  "description": "Advanced Discord automation bot with Voice and TypeORM",
+  "main": "dist/index.js",
+  "type": "module",
+  "engines": {
+    "node": ">=22"
+  },
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc && tsc-alias",
+    "start": "node dist/index.js",
+    "typeorm": "typeorm-ts-node-commonjs",
+    "db:migrate": "npm run typeorm -- migration:run -d src/database/data-source.ts",
+    "db:migrate:generate": "npm run typeorm -- migration:generate -d src/database/data-source.ts",
+    "db:migrate:revert": "npm run typeorm -- migration:revert -d src/database/data-source.ts",
+    "db:schema:sync": "npm run typeorm -- schema:sync -d src/database/data-source.ts"
+  },
+  "dependencies": {
+    "@discordjs/voice": "^0.19.0",
+    "colors": "^1.4.0",
+    "discord.js": "^14.25.1",
+    "dotenv": "^17.3.1",
+    "libsodium-wrappers": "^0.8.2",
+    "opusscript": "^0.1.1",
+    "pg": "^8.18.0",
+    "reflect-metadata": "^0.2.2",
+    "typeorm": "^0.3.28"
+  },
+  "devDependencies": {
+    "@types/node": "^25.3.0",
+    "tsc-alias": "^1.8.16",
+    "tsx": "^4.21.0",
+    "typescript": "^5.9.3"
+  },
+  "packageManager": "pnpm@10.29.3+sha512.498e1fb4cca5aa06c1dcf2611e6fafc50972ffe7189998c409e90de74566444298ffe43e6cd2acdc775ba1aa7cc5e092a8b7054c811ba8c5770f84693d33d2dc"
+}

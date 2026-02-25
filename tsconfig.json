@@ -1,0 +1,46 @@
+{
+  "compilerOptions": {
+    /* Path Mapping */
+    "ignoreDeprecations": "6.0", // Silences baseUrl deprecation warning in TS 6.0
+    "baseUrl": ".",
+    "paths": {
+      "@/*": ["src/*"]
+    },
+
+    /* File Layout */
+    "rootDir": "src",
+    "outDir": "dist",
+
+    /* Environment and Modules */
+    "target": "ESNext",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "moduleDetection": "force",
+    "lib": ["ESNext"],
+    "types": ["node"],
+
+    /* Interoperability and Output */
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "strict": true,
+    "skipLibCheck": true,
+    "sourceMap": true,
+    "declaration": true,
+    "declarationMap": true,
+
+    /* Advanced Security Rules */
+    "noUncheckedIndexedAccess": true,
+    "exactOptionalPropertyTypes": true,
+    "noUncheckedSideEffectImports": true,
+    "isolatedModules": true,
+    "verbatimModuleSyntax": true,
+
+    /* Framework & Decorator Support */
+    "experimentalDecorators": true,
+    "emitDecoratorMetadata": true,
+    "jsx": "react-jsx",
+    "resolveJsonModule": true
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist"]
+}
