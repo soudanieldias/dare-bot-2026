@@ -8,6 +8,7 @@ export class App {
 
   public bootstrap(): void {
     logger.info('App', 'Starting Dare Bot 2026...');
+    logger.info('App', 'Dare Bot Initialized successfully.');
     return;
   }
 }
