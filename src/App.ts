@@ -3,11 +3,11 @@ import type { IDareClient } from './interfaces/index.js';
 import {
   ActivityModule,
   DatabaseModule,
+  OnClientReadyModule,
   OnInteractionModule,
-  OnReadyModule,
+  OnMessageCreateModule,
 } from './modules/index.js';
-import { config } from './shared/Config.js';
-import { logger } from './shared/Logger.js';
+import { config, logger } from './shared/index.js';
 
 export class App {
   private client: IDareClient = getDiscordClient();
@@ -30,8 +30,9 @@ export class App {
   }
 
   private async initializeModules(): Promise<void> {
-    await new OnReadyModule(this.client).bootstrap();
+    await new OnClientReadyModule(this.client).bootstrap();
     await new ActivityModule(this.client).bootstrap();
     await new OnInteractionModule(this.client).bootstrap();
+    await new OnMessageCreateModule(this.client).bootstrap();
   }
 }

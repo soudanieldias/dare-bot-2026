@@ -2,7 +2,7 @@ import { Events } from 'discord.js';
 import { logger } from '@/shared/index.js';
 import type { IDareClient } from '@/interfaces/index.js';
 
-export class OnReadyModule {
+export class OnClientReadyModule {
   constructor(private readonly client: IDareClient) {}
 
   public bootstrap(): void {
