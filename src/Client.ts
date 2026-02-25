@@ -1,5 +1,5 @@
 import { Client, GatewayIntentBits, Partials } from 'discord.js';
-import { type IDareClient } from './interfaces/index.js';
+import type { IDareClient } from './interfaces/index.js';
 
 const partials: [] | Array<Partials> = [
   Partials.Channel,

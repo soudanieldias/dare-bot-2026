@@ -1,5 +1,5 @@
 import { getDiscordClient } from './Client.js';
-import { DatabaseModule, OnReadyModule } from './modules/index.js';
+import { ActivityModule, DatabaseModule, OnReadyModule } from './modules/index.js';
 import { config } from './shared/Config.js';
 import { logger } from './shared/Logger.js';
 
@@ -25,5 +25,6 @@ export class App {
 
   private async initializeModules(): Promise<void> {
     await new OnReadyModule(this.client).bootstrap();
+    await new ActivityModule(this.client).bootstrap();
   }
 }
