@@ -1,4 +1,4 @@
-export * from './data-source';
-export { getDataSource } from './client';
-export * from './entities';
-export * from './repositories';
+export * from './DatabaseSource.js';
+export * from './DatabaseClient.js';
+export * from './entities/index.js';
+export * from './repositories/index.js';
