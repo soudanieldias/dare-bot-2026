@@ -23,7 +23,7 @@ export class User {
   username!: string;
 
   /** User global points */
-  @Column({ default: 0 })
+  @Column({ type: 'integer', default: 0 })
   points!: number;
 
   /** Relation with members (1:N) */
