@@ -1,10 +1,16 @@
 import { getDiscordClient } from './Client.js';
-import { ActivityModule, DatabaseModule, OnReadyModule } from './modules/index.js';
+import type { IDareClient } from './interfaces/index.js';
+import {
+  ActivityModule,
+  DatabaseModule,
+  OnInteractionModule,
+  OnReadyModule,
+} from './modules/index.js';
 import { config } from './shared/Config.js';
 import { logger } from './shared/Logger.js';
 
 export class App {
-  private client = getDiscordClient();
+  private client: IDareClient = getDiscordClient();
 
   constructor() {}
 
@@ -26,5 +32,6 @@ export class App {
   private async initializeModules(): Promise<void> {
     await new OnReadyModule(this.client).bootstrap();
     await new ActivityModule(this.client).bootstrap();
+    await new OnInteractionModule(this.client).bootstrap();
   }
 }
