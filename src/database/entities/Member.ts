@@ -1,5 +1,5 @@
 import { Entity, PrimaryColumn, ManyToOne, JoinColumn, CreateDateColumn } from 'typeorm';
-import { Guild, User } from '@/database/entities';
+import { Guild, User } from '@/database/entities/index.js';
 
 /**
  * Represents the association of a user to a server (Guild).

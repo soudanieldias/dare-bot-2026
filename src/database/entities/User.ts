@@ -6,7 +6,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Member } from '@/database/entities';
+import { Member } from '@/database/entities/index.js';
 
 /**
  * Represents a global user of the system (Discord User).

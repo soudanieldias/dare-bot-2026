@@ -7,7 +7,7 @@ import {
   CreateDateColumn,
   UpdateDateColumn,
 } from 'typeorm';
-import { Guild } from '@/database/entities';
+import { Guild } from '@/database/entities/index.js';
 
 /**
  * Specific settings for each Guild (Discord server).
