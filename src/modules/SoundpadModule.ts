@@ -133,6 +133,7 @@ export class SoundpadModule {
       for (let i = 0; i < rows.length; i++) {
         const row = rows[i];
         if (!row) continue;
+
         await (channel as TextChannel).send({
           content: `Audio list (${config.category}): ${i + 1}`,
           components: [row],

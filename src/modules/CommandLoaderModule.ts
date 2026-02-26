@@ -1,6 +1,7 @@
 import { commandArrays } from '@/commands/index.js';
 import type { IDareClient } from '@/interfaces/index.js';
 import { logger, config } from '@/shared/index.js';
+import { SystemResourceHelper } from '@/utils/index.js';
 import { Collection, REST, Routes } from 'discord.js';
 
 export class CommandLoaderModule {
@@ -29,6 +30,9 @@ export class CommandLoaderModule {
 
       await rest.put(Routes.applicationCommands(clientId), { body: commandsData });
       logger.info('Commands', 'Commands loaded successfully.');
+
+      const stats = SystemResourceHelper.getStats();
+      logger.info('System', `Comandos carregados. RAM atual: ${stats.process.ram}`);
     } catch (error) {
       logger.error('Commands', `Failed to load commands: ${error}`);
     }
