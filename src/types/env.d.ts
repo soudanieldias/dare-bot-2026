@@ -25,5 +25,10 @@ declare namespace NodeJS {
     // Activity
     DEFAULT_ACTIVITY_TEXT: string;
     DEFAULT_ACTIVITY_TYPE: 'PLAYING' | 'STREAMING' | 'LISTENING' | 'WATCHING' | 'COMPETING';
+
+    // Voice
+    DEFAULT_GUILD_ID: string;
+    DEFAULT_CHANNEL_ID: string;
+    CONNECT_ON_STARTUP: boolean;
   }
 }

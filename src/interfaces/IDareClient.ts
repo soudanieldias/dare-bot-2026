@@ -1,6 +1,8 @@
-import type { Client } from 'discord.js';
+import type { AudioManagerModule } from '@/modules/AudioManagerModule.js';
+import type { Client, Collection } from 'discord.js';
 
 export interface IDareClient extends Client {
-  commands: Map<string, any>;
+  commands: Collection<string, any>;
   pads?: Map<string, { name: string; path: string }>;
+  audioManager: AudioManagerModule;
 }

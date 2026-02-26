@@ -14,4 +14,9 @@ export const config = {
     url: process.env.DATABASE_URL,
     logging: process.env.DATABASE_LOGGING === 'true',
   },
+  voice: {
+    bootGuild: process.env.DEFAULT_GUILD_ID || '',
+    bootChannel: process.env.DEFAULT_CHANNEL_ID || '',
+    connectOnStartup: process.env.CONNECT_ON_STARTUP,
+  },
 } as const;
