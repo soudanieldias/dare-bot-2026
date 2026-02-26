@@ -1,4 +1,4 @@
-import { Client, GatewayIntentBits, Partials } from 'discord.js';
+import { Client, Collection, GatewayIntentBits, Partials } from 'discord.js';
 import type { IDareClient } from './interfaces/index.js';
 
 const partials: [] | Array<Partials> = [
@@ -29,7 +29,7 @@ export function getDiscordClient(): IDareClient {
   if (!instance) {
     const client = new Client({ intents, partials }) as IDareClient;
     client.pads = new Map();
-    client.commands = new Map();
+    client.commands = new Collection();
     instance = client;
   }
   return instance;

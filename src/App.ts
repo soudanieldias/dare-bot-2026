@@ -8,6 +8,8 @@ import {
   OnClientReadyModule,
   OnInteractionModule,
   OnMessageCreateModule,
+  SoundpadModule,
+  SoundModule,
 } from './modules/index.js';
 import { config, logger } from './shared/index.js';
 
@@ -37,6 +39,10 @@ export class App {
     await new OnInteractionModule(this.client).bootstrap();
     await new OnMessageCreateModule(this.client).bootstrap();
     await new CommandLoaderModule(this.client).bootstrap();
+
+    // Initialize Sound System
     await new AudioManagerModule(this.client).bootstrap();
+    await new SoundModule(this.client).bootstrap();
+    await new SoundpadModule(this.client).bootstrap();
   }
 }

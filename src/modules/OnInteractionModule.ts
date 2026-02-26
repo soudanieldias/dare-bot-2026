@@ -4,11 +4,7 @@ import type { IDareClient } from '@/interfaces/IDareClient.js';
 import { Events, MessageFlags, type Interaction } from 'discord.js';
 
 export class OnInteractionModule {
-  private client: IDareClient;
-
-  constructor(client: IDareClient) {
-    this.client = client;
-  }
+  constructor(private readonly client: IDareClient) {}
 
   public bootstrap(): void {
     this.client.on(Events.InteractionCreate, async (interaction: Interaction) => {
@@ -49,13 +45,13 @@ export class OnInteractionModule {
 
         // Component Handlers: Buttons
         if (interaction.isButton()) {
-          // TODO: Implement button logic here
+          if (await this.client.soundpadModule.handleButton(interaction)) return;
           return;
         }
 
         // Component Handlers: Select Menus
         if (interaction.isStringSelectMenu()) {
-          // TODO: Implement string select menu logic here
+          if (await this.client.soundpadModule.handleSelectMenu(interaction)) return;
           return;
         }
 

@@ -22,7 +22,9 @@ export class AudioManagerModule {
   private playerMap = new Map<string, AudioPlayer>();
   private queueMap = new Map<string, AudioQueueItem[]>();
 
-  constructor(private readonly client: IDareClient) {}
+  constructor(private readonly client: IDareClient) {
+    this.client.audioManager = this;
+  }
 
   public async bootstrap(): Promise<void> {
     logger.info('Audio', 'AudioManagerModule inicializado (Unificado).');
@@ -106,5 +108,9 @@ export class AudioManagerModule {
   public stop(guildId: string) {
     this.playerMap.get(guildId)?.stop();
     this.cleanup(guildId);
+  }
+
+  public getConnectionChannelId(guildId: string): string {
+    return this.connectionMap.get(guildId)?.joinConfig.channelId || '';
   }
 }
