@@ -29,6 +29,7 @@ export function getDiscordClient(): IDareClient {
   if (!instance) {
     const client = new Client({ intents, partials }) as IDareClient;
     client.pads = new Map();
+    client.commands = new Map();
     instance = client;
   }
   return instance;

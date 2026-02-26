@@ -2,6 +2,7 @@ import { getDiscordClient } from './Client.js';
 import type { IDareClient } from './interfaces/index.js';
 import {
   ActivityModule,
+  CommandLoaderModule,
   DatabaseModule,
   OnClientReadyModule,
   OnInteractionModule,
@@ -34,5 +35,6 @@ export class App {
     await new ActivityModule(this.client).bootstrap();
     await new OnInteractionModule(this.client).bootstrap();
     await new OnMessageCreateModule(this.client).bootstrap();
+    await new CommandLoaderModule(this.client).bootstrap();
   }
 }
