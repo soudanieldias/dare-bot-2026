@@ -1,5 +1,7 @@
+import { commandMap } from '@/commands/index.js';
+import { getI18n } from '@/i18n/index.js';
 import type { IDareClient } from '@/interfaces/IDareClient.js';
-import { Events, type Interaction } from 'discord.js';
+import { Events, MessageFlags, type Interaction } from 'discord.js';
 
 export class OnInteractionModule {
   private client: IDareClient;
@@ -13,7 +15,12 @@ export class OnInteractionModule {
       try {
         // ChatInputCommand Handler
         if (interaction.isChatInputCommand()) {
-          // TODO: Implement slash command logic here
+          console.log(`Received command: ${interaction.commandName} from ${interaction.user.tag}`);
+          const command = commandMap.get(interaction.commandName);
+
+          if (command) {
+            return command.execute(this.client, interaction);
+          }
           return;
         }
 
@@ -90,7 +97,11 @@ export class OnInteractionModule {
 
         // Final Fallback for repliable interactions
         if (interaction.isRepliable()) {
-          await interaction.reply({ content: 'Under Construction', ephemeral: true });
+          const locale = 'locale' in interaction ? interaction.locale : 'pt-BR';
+          await interaction.reply({
+            content: getI18n(locale).common.underConstruction,
+            flags: MessageFlags.Ephemeral,
+          });
         }
       } catch (error) {
         console.error('Interaction error:', error);

@@ -1,9 +1,8 @@
 {
   "compilerOptions": {
     /* Path Mapping */
-    "baseUrl": ".",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["./src/*"]
     },
 
     /* File Layout */

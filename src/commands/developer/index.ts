@@ -1,3 +1,4 @@
-import { type SlashCommand } from '@/commands/index.js';
+import { type ICommand } from '@/interfaces/index.js';
+import setImage from './setimage.js';
 
-export const commands: SlashCommand[] = [];
+export const commands: ICommand[] = [setImage];

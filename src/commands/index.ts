@@ -1,20 +1,13 @@
-import type { ButtonInteraction, ChatInputCommandInteraction } from 'discord.js';
-import { type IDareClient } from '@/interfaces/index.js';
+import { type ICommand } from '@/interfaces/index.js';
 import * as developer from './developer/index.js';
 import * as features from './features/index.js';
 import * as help from './help/index.js';
 import * as music from './music/index.js';
 import * as staff from './staff/index.js';
 
-export interface SlashCommand {
-  data: { name: string; toJSON: () => unknown };
-  execute: (
-    client: IDareClient,
-    interaction: ChatInputCommandInteraction | ButtonInteraction
-  ) => Promise<void>;
-}
+export type { ICommand };
 
-export const commandArrays: SlashCommand[] = [
+export const commandArrays: ICommand[] = [
   ...developer.commands,
   ...features.commands,
   ...help.commands,
@@ -22,6 +15,6 @@ export const commandArrays: SlashCommand[] = [
   ...staff.commands,
 ];
 
-export const commandMap = new Map<string, SlashCommand>(
+export const commandMap = new Map<string, ICommand>(
   commandArrays.map((cmd) => [cmd.data.name, cmd])
 );
