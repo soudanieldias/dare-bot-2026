@@ -21,5 +21,9 @@ declare namespace NodeJS {
     // System
     NODE_ENV: 'development' | 'production' | 'test';
     DEBUG: 'true' | 'false';
+
+    // Activity
+    DEFAULT_ACTIVITY_TEXT: string;
+    DEFAULT_ACTIVITY_TYPE: 'PLAYING' | 'STREAMING' | 'LISTENING' | 'WATCHING' | 'COMPETING';
   }
 }

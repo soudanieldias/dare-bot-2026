@@ -7,7 +7,7 @@ export class OnClientReadyModule {
 
   public bootstrap(): void {
     this.client.once(Events.ClientReady, (readyClient) => {
-      this.printStatus(readyClient);
+      this.printStatus(readyClient as IDareClient);
     });
   }
 

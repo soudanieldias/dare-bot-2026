@@ -1,5 +1,5 @@
 import { ActivityType } from 'discord.js';
-import { logger } from '@/shared/index.js';
+import { config, logger } from '@/shared/index.js';
 import type { IDareClient } from '@/interfaces/index.js';
 
 export class ActivityModule {
@@ -8,8 +8,8 @@ export class ActivityModule {
   bootstrap(): void {
     this.client.once('clientReady', () => {
       logger.info('Activity', 'Inicializando Activity do BOT.');
-      this.client.user?.setActivity('BOLADINHO!', {
-        type: ActivityType.Streaming,
+      this.client.user?.setActivity(config.discord.activityText, {
+        type: config.discord.activityType as unknown as ActivityType,
         url: 'https://diasitservices.com.br/',
       });
       this.client.user?.setPresence({ status: 'online' });

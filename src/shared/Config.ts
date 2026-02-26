@@ -7,6 +7,8 @@ export const config = {
     devId: process.env.DEV_ID ?? '',
     debug: process.env.DEBUG === 'true',
     prefix: process.env.BOT_PREFIX ?? '//',
+    activityText: process.env.DEFAULT_ACTIVITY_TEXT ?? 'Dare Bot 2026',
+    activityType: process.env.DEFAULT_ACTIVITY_TYPE ?? 'PLAYING',
   },
   database: {
     url: process.env.DATABASE_URL,

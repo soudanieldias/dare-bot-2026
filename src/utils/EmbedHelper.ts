@@ -19,7 +19,7 @@ export async function sendEmbed(
     return;
   }
   if (interaction.deferred) {
-    await interaction.editReply({ embeds: [embed], flags });
+    await interaction.editReply({ embeds: [embed] });
     return;
   }
 
