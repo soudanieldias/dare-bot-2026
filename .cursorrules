@@ -1,0 +1,78 @@
+# DARE-BOT-2026 — Project Documentation
+
+## Overview
+
+Discord bot in TypeScript (ESM) with voice channel audio, TypeORM/PostgreSQL, slash commands, and i18n.
+
+**Stack:** Node ≥24, TypeScript 5.9, discord.js 14, @discordjs/voice, typeorm, pg, pnpm.
+
+## Folder Structure
+
+```
+DARE-BOT-2026/
+├── src/
+│   ├── index.ts              # Entry: App.bootstrap()
+│   ├── App.ts                # Bootstrap, modules, Discord login
+│   ├── Client.ts             # Discord singleton (getDiscordClient)
+│   ├── commands/
+│   │   ├── index.ts          # Command aggregator
+│   │   ├── developer/        # Dev commands (e.g. setimage)
+│   │   ├── features/         # Feature commands
+│   │   ├── help/             # Help commands
+│   │   ├── music/            # Music commands
+│   │   └── staff/            # Staff commands
+│   ├── database/
+│   │   ├── index.ts
+│   │   ├── DatabaseClient.ts
+│   │   ├── DatabaseSource.ts # AppDataSource (TypeORM)
+│   │   ├── entities/         # Guild, GuildSettings, User, Member
+│   │   └── repositories/     # GuildRepository, UserRepository, MemberRepository
+│   ├── i18n/
+│   │   ├── index.ts, types.ts
+│   │   └── locales/          # pt-BR.ts, en.ts
+│   ├── interfaces/           # ICommand, IDareClient, IAudio
+│   ├── modules/
+│   │   ├── DatabaseModule
+│   │   ├── OnClientReadyModule
+│   │   ├── ActivityModule
+│   │   ├── OnInteractionModule
+│   │   ├── OnMessageCreateModule
+│   │   ├── CommandLoaderModule
+│   │   └── AudioManagerModule
+│   ├── shared/               # Config.ts, Logger.ts
+│   └── utils/                # EmbedHelper.ts
+├── .github/workflows/deploy.yml
+├── .vscode/settings.json
+├── package.json, tsconfig.json, eslint.config.js, .prettierrc
+├── Dockerfile, .dockerignore, .env.example
+└── readme.MD
+```
+
+## Bootstrap Flow
+
+1. `index.ts` → `new App().bootstrap()`
+2. `DatabaseModule.bootstrap()`
+3. Modules: OnClientReady → Activity → OnInteraction → OnMessageCreate → CommandLoader → AudioManager
+4. `client.login(token)`
+
+## Path Alias
+
+- `@/*` → `./src/*` (e.g. `import { X } from '@/shared/index.js'`)
+
+## Commands
+
+- Interface `ICommand` in `src/interfaces/ICommand.ts`: `data`, `category?`, `execute()`
+- Slash commands: `SlashCommandBuilder` or `SlashCommandOptionsOnlyBuilder`
+
+## Scripts
+
+- `pnpm dev` — tsx watch (development)
+- `pnpm build` — tsc && tsc-alias
+- `pnpm start` — node dist/index.js
+- `db:migrate`, `db:migrate:generate`, etc. — TypeORM (reference `src/database/data-source.ts`; project uses `DatabaseSource.ts`)
+
+## Environment Variables (.env.example)
+
+- Discord: `DISCORD_TOKEN`, `DISCORD_CLIENT_ID`, `DISCORD_APPLICATION_ID`, `DEV_ID`, `BOT_PREFIX`
+- DB: `DATABASE_URL` or `DATABASE_HOST`, `DATABASE_PORT`, etc.
+- Optional: `REDIS_URL`, `LAVALINK_*`, `AUTH_SECRET`, `NEXTAUTH_URL`
