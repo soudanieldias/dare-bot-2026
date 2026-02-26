@@ -67,7 +67,8 @@ export class AudioManagerModule {
 
   public async play(guildId: string, channelId: string, adapterCreator: any, item: AudioQueueItem) {
     const player = this.getOrCreatePlayer(guildId, channelId, adapterCreator);
-    const resource = createAudioResource(item.source);
+    const resource = createAudioResource(item.source, { inlineVolume: true });
+    resource.volume?.setVolume(0.1);
 
     if (item.type === 'EFFECT') {
       logger.info('Audio', `Tocando efeito: ${item.name}`);
