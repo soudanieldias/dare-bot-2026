@@ -1,5 +1,5 @@
 import { AppDataSource } from '@/database/DatabaseSource.js';
-import { logger } from '@/shared/Logger.js';
+import { logger } from '@/shared/index.js';
 
 export class DatabaseModule {
   async bootstrap(): Promise<void> {
@@ -16,7 +16,11 @@ export class DatabaseModule {
         logger.debug('Database', 'No pending migrations found.');
       }
     } catch (error) {
-      logger.error('Database', `Bootstrap failed: ${error}`);
+      await logger.critical(
+        'Database',
+        `Bootstrap failed: ${error}`,
+        error instanceof Error ? error : undefined
+      );
       throw error;
     }
   }

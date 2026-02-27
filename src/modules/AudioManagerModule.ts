@@ -114,4 +114,10 @@ export class AudioManagerModule {
   public getConnectionChannelId(guildId: string): string {
     return this.connectionMap.get(guildId)?.joinConfig.channelId || '';
   }
+
+  public shutdown(): void {
+    for (const guildId of this.connectionMap.keys()) {
+      this.cleanup(guildId);
+    }
+  }
 }

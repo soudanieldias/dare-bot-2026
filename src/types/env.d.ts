@@ -21,6 +21,7 @@ declare namespace NodeJS {
     // System
     NODE_ENV: 'development' | 'production' | 'test';
     DEBUG: 'true' | 'false';
+    LOG_WEBHOOK_URL?: string;
 
     // Activity
     DEFAULT_ACTIVITY_TEXT: string;

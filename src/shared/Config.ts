@@ -19,4 +19,7 @@ export const config = {
     bootChannel: process.env.DEFAULT_CHANNEL_ID || '',
     connectOnStartup: process.env.CONNECT_ON_STARTUP,
   },
+  logging: {
+    webhookUrl: process.env.LOG_WEBHOOK_URL ?? '',
+  },
 } as const;

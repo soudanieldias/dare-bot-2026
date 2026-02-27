@@ -47,6 +47,44 @@ export class Logger {
       this.error('Logger', `Failed to send debug DM: ${err}`);
     }
   }
+
+  async critical(module: string, msg: unknown, error?: Error): Promise<void> {
+    const text = typeof msg === 'string' ? msg : String(msg);
+    console.error(colors.red(`[CRITICAL/${module}]`), text);
+    if (error?.stack) console.error(error.stack);
+
+    const webhookUrl = config.logging.webhookUrl;
+    if (!webhookUrl) return;
+
+    try {
+      const fields: { name: string; value: string }[] = [];
+      if (error?.stack) {
+        fields.push({
+          name: 'Stack',
+          value: `\`\`\`${error.stack.slice(0, 1000)}\`\`\``,
+        });
+      }
+
+      await fetch(webhookUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          embeds: [
+            {
+              title: `Critical: ${module}`,
+              description: text.slice(0, 4000),
+              color: 0xff0000,
+              timestamp: new Date().toISOString(),
+              footer: { text: 'DARE-BOT Logs' },
+              fields: fields.length > 0 ? fields : undefined,
+            },
+          ],
+        }),
+      });
+    } catch (err) {
+      console.error('[Logger] Failed to send critical to Discord:', err);
+    }
+  }
 }
 
 export const logger = new Logger();

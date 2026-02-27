@@ -13,10 +13,8 @@ export class CommandLoaderModule {
       const { clientId, token } = config.discord;
 
       if (!clientId) {
-        return logger.error(
-          'Commands',
-          'DISCORD_CLIENT_ID is not set. Please set it in the .env file.'
-        );
+        await logger.critical('Commands', 'DISCORD_CLIENT_ID is not set. Set it in .env');
+        return;
       }
 
       this.client.commands = new Collection();
@@ -34,7 +32,11 @@ export class CommandLoaderModule {
       const stats = SystemResourceHelper.getStats();
       logger.info('System', `Comandos carregados. RAM atual: ${stats.process.ram}`);
     } catch (error) {
-      logger.error('Commands', `Failed to load commands: ${error}`);
+      await logger.critical(
+        'Commands',
+        `Failed to load commands: ${error}`,
+        error instanceof Error ? error : undefined
+      );
     }
   }
 }
