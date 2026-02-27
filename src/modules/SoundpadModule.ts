@@ -12,6 +12,7 @@ import type {
 import { logger } from '@/shared/index.js';
 
 export const SOUNDPAD_CATEGORIES: Array<{ label: string; value: string }> = [
+  { label: 'todos', value: 'spad_all' },
   { label: 'audios', value: 'spad_audios' },
   { label: 'frases', value: 'spad_frases' },
   { label: 'memes', value: 'spad_memes' },
@@ -20,6 +21,7 @@ export const SOUNDPAD_CATEGORIES: Array<{ label: string; value: string }> = [
 ];
 
 const SOUNDPAD_PATHS: Record<string, { path: string; category: string }> = {
+  spad_all: { path: 'src/audios', category: 'todos' },
   spad_audios: { path: 'src/audios/audios', category: 'audios' },
   spad_frases: { path: 'src/audios/frases', category: 'frases' },
   spad_memes: { path: 'src/audios/memes', category: 'memes' },
@@ -69,12 +71,16 @@ function generateButtons(basePath: string): ActionRowBuilder<ButtonBuilder>[] {
         new ButtonBuilder()
           .setCustomId(key)
           .setLabel(label.length > 80 ? label.slice(0, 77) + '...' : label)
-          .setStyle(ButtonStyle.Secondary)
+          .setStyle(ButtonStyle.Primary)
       );
     }
     rows.push(row);
   }
   return rows;
+}
+
+export function generateSoundpadButtons(basePath: string): ActionRowBuilder<ButtonBuilder>[] {
+  return generateButtons(basePath);
 }
 
 export class SoundpadModule {
@@ -175,10 +181,11 @@ export class SoundpadModule {
         pad,
         params
       );
-      await interaction.reply({
-        content: `Playing: ${pad.name}`,
-        flags: [MessageFlags.Ephemeral],
-      });
+      // await interaction.reply({
+      //   content: `Playing: ${pad.name}`,
+      //   flags: [MessageFlags.Ephemeral],
+      // });
+      await interaction.deferUpdate();
     } catch (error) {
       await interaction.reply({
         content: error instanceof Error ? error.message : 'Failed to play sound.',

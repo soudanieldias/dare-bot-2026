@@ -7,10 +7,12 @@ export class Logger {
   private readonly devId = config.discord.devId ?? null;
 
   info(module: string, msg: unknown): void {
+    if (!this.isDebug) return;
     console.log(colors.green(`[INFO/${module}]`), msg);
   }
 
   startup(msg: unknown): void {
+    if (!this.isDebug) return;
     console.log(colors.cyan('[STARTUP]'), msg);
   }
 
@@ -19,6 +21,7 @@ export class Logger {
   }
 
   warn(module: string, msg: unknown): void {
+    if (!this.isDebug) return;
     console.warn(colors.yellow(`[WARN/${module}]`), msg);
   }
 

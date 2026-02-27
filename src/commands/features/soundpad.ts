@@ -6,10 +6,11 @@ import {
   MessageFlags,
   GuildMember,
   type Interaction,
+  type TextChannel,
 } from 'discord.js';
 import type { IDareClient } from '@/interfaces/IDareClient.js';
 import type { ICommand } from '@/interfaces/ICommand.js';
-import { SOUNDPAD_CATEGORIES } from '@/modules/index.js';
+import { SOUNDPAD_CATEGORIES, generateSoundpadButtons } from '@/modules/index.js';
 
 function findPad(client: IDareClient, input: string): { name: string; path: string } | undefined {
   const pad = client.pads?.get(input);
@@ -26,7 +27,10 @@ export const soundpadCommand: ICommand = {
     .setDescription('Comandos de SoundPad')
     .setDefaultMemberPermissions(PermissionFlagsBits.UseApplicationCommands)
     .addSubcommand((sc) =>
-      sc.setName('list').setDescription('Lista todos os áudios disponíveis no SoundPad')
+      sc.setName('list').setDescription('Lista áudios por categoria (menu)')
+    )
+    .addSubcommand((sc) =>
+      sc.setName('list-all').setDescription('Lista todos os áudios de uma vez')
     )
     .addSubcommand((sc) =>
       sc
@@ -115,6 +119,35 @@ export const soundpadCommand: ICommand = {
         components: [row],
         flags: [MessageFlags.Ephemeral],
       });
+      return;
+    }
+
+    if (subCommand === 'list-all') {
+      const rows = generateSoundpadButtons('src/audios');
+      if (rows.length === 0) {
+        await interaction.reply({
+          content: 'Nenhum áudio encontrado.',
+          flags: [MessageFlags.Ephemeral],
+        });
+        return;
+      }
+
+      await interaction.reply({
+        content: 'Enviando lista de todos os áudios.',
+        flags: [MessageFlags.Ephemeral],
+      });
+
+      const channel = interaction.channel;
+      if (channel && 'send' in channel) {
+        for (let i = 0; i < rows.length; i++) {
+          const row = rows[i];
+          if (!row) continue;
+          await (channel as TextChannel).send({
+            content: `Lista de áudios (todos): ${i + 1}`,
+            components: [row],
+          });
+        }
+      }
     }
   },
 };
