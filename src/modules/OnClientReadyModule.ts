@@ -9,7 +9,7 @@ export class OnClientReadyModule {
   public bootstrap(): void {
     this.client.once(Events.ClientReady, async (readyClient) => {
       this.printStatus(readyClient as IDareClient);
-      await new DatabaseModule().populateServers(readyClient as IDareClient);
+      await DatabaseModule.populateServers(this.client);
     });
   }
 

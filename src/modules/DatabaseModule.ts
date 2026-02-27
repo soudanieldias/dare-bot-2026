@@ -27,7 +27,7 @@ export class DatabaseModule {
     }
   }
 
-  async populateServers(client: IDareClient): Promise<void> {
+  public static async populateServers(client: IDareClient): Promise<void> {
     try {
       const guildRepo = new GuildRepository();
       const guilds = client.guilds.cache;
