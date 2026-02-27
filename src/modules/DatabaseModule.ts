@@ -1,4 +1,6 @@
 import { AppDataSource } from '@/database/DatabaseSource.js';
+import { GuildRepository } from '@/database/repositories/GuildRepository.js';
+import { type IDareClient } from '@/interfaces/index.js';
 import { logger } from '@/shared/index.js';
 
 export class DatabaseModule {
@@ -22,6 +24,26 @@ export class DatabaseModule {
         error instanceof Error ? error : undefined
       );
       throw error;
+    }
+  }
+
+  async populateServers(client: IDareClient): Promise<void> {
+    try {
+      const guildRepo = new GuildRepository();
+      const guilds = client.guilds.cache;
+
+      for (const [, guild] of guilds) {
+        await guildRepo.upsert({
+          id: guild.id,
+          name: guild.name,
+          iconURL: guild.iconURL() ?? null,
+          bannerURL: guild.bannerURL() ?? null,
+        });
+      }
+
+      logger.info('Database', 'Guildas populadas no banco de dados com sucesso.');
+    } catch (error) {
+      logger.error('Database', `Erro ao popular guilds: ${error}`);
     }
   }
 }

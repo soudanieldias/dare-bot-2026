@@ -10,6 +10,7 @@ declare namespace NodeJS {
 
     // Database
     DATABASE_URL: string;
+    DATABASE_TYPE: 'postgres' | 'mysql';
     DATABASE_HOST: string;
     DATABASE_PORT: string;
     DATABASE_USER: string;

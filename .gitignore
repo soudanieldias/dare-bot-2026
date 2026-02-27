@@ -4,6 +4,7 @@ dist/
 *.log
 
 sandbox/
+releases/
 
 src/audios/**/*.mp3
 src/audios/**/*.wav
