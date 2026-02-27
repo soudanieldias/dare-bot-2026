@@ -7,3 +7,4 @@ export * from './OnInteractionModule.js';
 export * from './OnMessageCreateModule.js';
 export * from './SoundModule.js';
 export * from './SoundpadModule.js';
+export * from './TtsModule.js';

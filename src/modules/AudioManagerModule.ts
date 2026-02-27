@@ -1,3 +1,4 @@
+import type { Readable } from 'node:stream';
 import {
   AudioPlayer,
   AudioPlayerStatus,
@@ -6,7 +7,6 @@ import {
   joinVoiceChannel,
   VoiceConnection,
   VoiceConnectionStatus,
-  AudioResource,
 } from '@discordjs/voice';
 import { type IDareClient } from '@/interfaces/IDareClient.js';
 import { logger } from '@/shared/index.js';
@@ -63,6 +63,18 @@ export class AudioManagerModule {
     }
 
     return player;
+  }
+
+  public playFromStream(
+    guildId: string,
+    channelId: string,
+    adapterCreator: unknown,
+    stream: Readable
+  ): void {
+    const player = this.getOrCreatePlayer(guildId, channelId, adapterCreator);
+    const resource = createAudioResource(stream, { inlineVolume: true });
+    resource.volume?.setVolume(0.5);
+    player.play(resource);
   }
 
   public async play(guildId: string, channelId: string, adapterCreator: any, item: AudioQueueItem) {

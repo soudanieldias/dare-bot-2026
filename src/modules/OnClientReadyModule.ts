@@ -1,7 +1,7 @@
 import { Events } from 'discord.js';
 import { logger } from '@/shared/index.js';
 import type { IDareClient } from '@/interfaces/index.js';
-import { DatabaseModule } from './DatabaseModule.js';
+// import { DatabaseModule } from './DatabaseModule.js';
 
 export class OnClientReadyModule {
   constructor(private readonly client: IDareClient) {}
@@ -9,7 +9,7 @@ export class OnClientReadyModule {
   public bootstrap(): void {
     this.client.once(Events.ClientReady, async (readyClient) => {
       this.printStatus(readyClient as IDareClient);
-      await DatabaseModule.populateServers(this.client);
+      // await DatabaseModule.populateServers(this.client);
     });
   }
 

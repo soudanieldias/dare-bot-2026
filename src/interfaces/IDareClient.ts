@@ -1,6 +1,7 @@
 import type { AudioManagerModule } from '@/modules/AudioManagerModule.js';
 import type { SoundModule } from '@/modules/SoundModule.js';
 import type { SoundpadModule } from '@/modules/SoundpadModule.js';
+import type { TtsModule } from '@/modules/TtsModule.js';
 import type { Client, Collection } from 'discord.js';
 
 export interface IDareClient extends Client {
@@ -9,4 +10,5 @@ export interface IDareClient extends Client {
   audioManager: AudioManagerModule;
   soundModule: SoundModule;
   soundpadModule: SoundpadModule;
+  ttsModule: TtsModule;
 }
