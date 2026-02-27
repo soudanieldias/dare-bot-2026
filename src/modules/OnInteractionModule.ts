@@ -1,5 +1,5 @@
 import { commandMap } from '@/commands/index.js';
-import { getI18n } from '@/i18n/index.js';
+import { getI18n } from '@/utils/index.js';
 import type { IDareClient } from '@/interfaces/IDareClient.js';
 import { Events, MessageFlags, type Interaction } from 'discord.js';
 

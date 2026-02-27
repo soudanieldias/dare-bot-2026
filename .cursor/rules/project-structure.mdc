@@ -32,9 +32,6 @@ DARE-BOT-2026/
 │   │   ├── DatabaseSource.ts # AppDataSource (TypeORM)
 │   │   ├── entities/         # Guild, GuildSettings, User, Member
 │   │   └── repositories/     # GuildRepository, UserRepository, MemberRepository
-│   ├── i18n/
-│   │   ├── index.ts, types.ts
-│   │   └── locales/          # pt-BR.ts, en.ts
 │   ├── interfaces/           # ICommand, IDareClient, IAudio
 │   ├── modules/
 │   │   ├── DatabaseModule
@@ -45,7 +42,7 @@ DARE-BOT-2026/
 │   │   ├── CommandLoaderModule
 │   │   └── AudioManagerModule
 │   ├── shared/               # Config.ts, Logger.ts
-│   └── utils/                # EmbedHelper.ts
+│   └── utils/                # EmbedHelper.ts, i18n.ts (getI18n, replaceParams)
 ├── .github/workflows/deploy.yml
 ├── .vscode/settings.json
 ├── package.json, tsconfig.json, eslint.config.js, .prettierrc
