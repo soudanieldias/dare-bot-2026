@@ -2,6 +2,7 @@ import type { Readable } from 'node:stream';
 import {
   AudioPlayer,
   AudioPlayerStatus,
+  AudioResource,
   createAudioPlayer,
   createAudioResource,
   joinVoiceChannel,
@@ -24,6 +25,7 @@ export class AudioManagerModule {
   private playerMap = new Map<string, AudioPlayer>();
   private queueMap = new Map<string, AudioQueueItem[]>();
   private volumeMap = new Map<string, number>();
+  private resourceMap = new Map<string, AudioResource>();
   private musicOnIdleCallback?: MusicOnIdleCallback;
 
   constructor(private readonly client: IDareClient) {
@@ -73,6 +75,21 @@ export class AudioManagerModule {
     return player;
   }
 
+  public playFromUrl(
+    guildId: string,
+    channelId: string,
+    adapterCreator: unknown,
+    url: string,
+    volume?: number
+  ): void {
+    const player = this.getOrCreatePlayer(guildId, channelId, adapterCreator);
+    const vol = volume ?? this.volumeMap.get(guildId) ?? 0.5;
+    const resource = createAudioResource(url, { inlineVolume: true });
+    resource.volume?.setVolume(vol);
+    this.resourceMap.set(guildId, resource);
+    player.play(resource);
+  }
+
   public playFromStream(
     guildId: string,
     channelId: string,
@@ -84,11 +101,17 @@ export class AudioManagerModule {
     const vol = volume ?? this.volumeMap.get(guildId) ?? 0.5;
     const resource = createAudioResource(stream, { inlineVolume: true });
     resource.volume?.setVolume(vol);
+    this.resourceMap.set(guildId, resource);
     player.play(resource);
   }
 
   public setVolume(guildId: string, volume: number): void {
-    this.volumeMap.set(guildId, Math.max(0, Math.min(1, volume)));
+    const vol = Math.max(0, Math.min(1, volume));
+    this.volumeMap.set(guildId, vol);
+    const resource = this.resourceMap.get(guildId);
+    if (resource?.volume) {
+      resource.volume.setVolume(vol);
+    }
   }
 
   public getVolume(guildId: string): number {
@@ -110,7 +133,9 @@ export class AudioManagerModule {
   public async play(guildId: string, channelId: string, adapterCreator: any, item: AudioQueueItem) {
     const player = this.getOrCreatePlayer(guildId, channelId, adapterCreator);
     const resource = createAudioResource(item.source, { inlineVolume: true });
-    resource.volume?.setVolume(0.1);
+    const vol = this.volumeMap.get(guildId) ?? 0.1;
+    resource.volume?.setVolume(vol);
+    this.resourceMap.set(guildId, resource);
 
     if (item.type === 'EFFECT') {
       logger.info('Audio', `Tocando efeito: ${item.name}`);
@@ -134,7 +159,10 @@ export class AudioManagerModule {
 
     const nextItem = queue.shift();
     if (nextItem) {
-      const resource = createAudioResource(nextItem.source);
+      const resource = createAudioResource(nextItem.source, { inlineVolume: true });
+      const vol = this.volumeMap.get(guildId) ?? 0.5;
+      resource.volume?.setVolume(vol);
+      this.resourceMap.set(guildId, resource);
       player.play(resource);
       logger.info('Audio', `Tocando agora (Fila): ${nextItem.name}`);
     }
@@ -145,6 +173,7 @@ export class AudioManagerModule {
     this.connectionMap.delete(guildId);
     this.playerMap.delete(guildId);
     this.queueMap.delete(guildId);
+    this.resourceMap.delete(guildId);
     this.volumeMap.delete(guildId);
     logger.info('Audio', `Recursos limpos para a guilda: ${guildId}`);
   }

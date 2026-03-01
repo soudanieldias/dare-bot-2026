@@ -3,7 +3,8 @@ import type { GuildMember } from 'discord.js';
 import type { IDareClient } from '@/interfaces/IDareClient.js';
 import type { IConnectionParams } from '@/interfaces/IAudio.js';
 import { logger } from '@/shared/index.js';
-import ytdl from 'discord-ytdl-core';
+import ytdl from '@distube/ytdl-core';
+import prism from 'prism-media';
 import { YouTube } from 'youtube-sr';
 
 export interface IMusicQueueItem {
@@ -29,18 +30,13 @@ export class MusicModule {
   }
 
   private createYtdlStream(url: string): Readable {
-    return ytdl(url, {
-      filter: 'audioonly',
-      opusEncoded: false,
-      fmt: 'mp3',
+    const transcoder = new prism.FFmpeg({
+      args: ['-analyzeduration', '0', '-loglevel', '0', '-f', 's16le', '-ar', '48000', '-ac', '2'],
+      shell: false,
     });
-  }
-
-  private createArbitraryStream(source: string): Readable {
-    return ytdl.arbitraryStream(source, {
-      opusEncoded: false,
-      fmt: 'mp3',
-    });
+    const input = ytdl(url, { filter: 'audioonly' });
+    input.on('error', () => transcoder.destroy());
+    return input.pipe(transcoder);
   }
 
   private async resolveQuery(query: string): Promise<IMusicQueueItem[]> {
@@ -92,22 +88,29 @@ export class MusicModule {
     if (!connParams) return;
 
     try {
-      const stream =
-        item.type === 'arbitrary'
-          ? this.createArbitraryStream(item.url)
-          : this.createYtdlStream(item.url);
-      stream.on('error', () => {
-        logger.error('Music', `Erro no stream: ${item.name}`);
-        this.playNext(guildId);
-      });
       const vol = this.client.audioManager.getVolume(guildId);
-      this.client.audioManager.playFromStream(
-        guildId,
-        connParams.channelId,
-        connParams.adapterCreator,
-        stream,
-        vol
-      );
+      if (item.type === 'arbitrary') {
+        this.client.audioManager.playFromUrl(
+          guildId,
+          connParams.channelId,
+          connParams.adapterCreator,
+          item.url,
+          vol
+        );
+      } else {
+        const stream = this.createYtdlStream(item.url);
+        stream.on('error', () => {
+          logger.error('Music', `Erro no stream: ${item.name}`);
+          this.playNext(guildId);
+        });
+        this.client.audioManager.playFromStream(
+          guildId,
+          connParams.channelId,
+          connParams.adapterCreator,
+          stream,
+          vol
+        );
+      }
       logger.info('Music', `Tocando: ${item.name}`);
     } catch (err) {
       logger.error('Music', `Erro ao tocar ${item.name}: ${err}`);
@@ -173,7 +176,7 @@ export class MusicModule {
     this.client.audioManager.skip(guildId);
   }
 
-  getQueue(guildId: string): { current: IMusicQueueItem | null; queue: MusicQueueItem[] } {
+  getQueue(guildId: string): { current: IMusicQueueItem | null; queue: IMusicQueueItem[] } {
     const current = this.currentTrackMap.get(guildId) ?? null;
     const queue = this.queueMap.get(guildId) ?? [];
     return { current, queue };

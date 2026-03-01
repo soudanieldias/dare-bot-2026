@@ -2,7 +2,7 @@ import { readdirSync } from 'fs';
 import { join, extname, relative } from 'path';
 import { Events, MessageFlags, ActionRowBuilder, ButtonBuilder, ButtonStyle } from 'discord.js';
 import type { IDareClient } from '@/interfaces/IDareClient.js';
-import type { ConnectionParams, PadInfo } from '@/interfaces/IAudio.js';
+import type { IConnectionParams, IPadInfo } from '@/interfaces/IAudio.js';
 import { GuildMember } from 'discord.js';
 import type {
   StringSelectMenuInteraction,
@@ -115,11 +115,13 @@ export class SoundpadModule {
     }
   }
 
-  async playPad(pad: PadInfo, params: ConnectionParams, member: GuildMember): Promise<void> {
+  async playPad(pad: IPadInfo, params: IConnectionParams, member: GuildMember): Promise<void> {
     const { guildId, channelId, adapterCreator } = params;
     const existingChannelId = this.client.audioManager.getConnectionChannelId(guildId);
     if (existingChannelId && existingChannelId !== member.voice.channel?.id) {
-      const botChannel = member.guild.channels.cache.get(existingChannelId) as VoiceChannel | undefined;
+      const botChannel = member.guild.channels.cache.get(existingChannelId) as
+        | VoiceChannel
+        | undefined;
       if (botChannel && 'members' in botChannel && botChannel.members.size > 1) {
         throw new Error('Bot is already in another voice channel.');
       }

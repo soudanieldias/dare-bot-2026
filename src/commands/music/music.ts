@@ -94,7 +94,7 @@ export const musicCommand: ICommand = {
         const mem = await resolveMember(member, guild, interaction.user.id);
         if (!mem) throw new Error('Membro não encontrado');
 
-        await interaction.deferReply({ ephemeral: true });
+        await interaction.deferReply({ flags: [MessageFlags.Ephemeral] });
 
         const { added, message } = await client.musicModule.play(
           connectionParams,
@@ -170,7 +170,7 @@ export const musicCommand: ICommand = {
         const mem = await resolveMember(member, guild, interaction.user.id);
         if (!mem) throw new Error('Membro não encontrado');
 
-        await interaction.deferReply({ ephemeral: true });
+        await interaction.deferReply({ flags: [MessageFlags.Ephemeral] });
 
         const { message } = await client.musicModule.play(
           connectionParams,
