@@ -4,7 +4,6 @@ import type { IDareClient } from '@/interfaces/IDareClient.js';
 import type { IConnectionParams } from '@/interfaces/IAudio.js';
 import { logger } from '@/shared/index.js';
 import ytdl from '@distube/ytdl-core';
-import prism from 'prism-media';
 import { YouTube } from 'youtube-sr';
 
 export interface IMusicQueueItem {
@@ -29,14 +28,22 @@ export class MusicModule {
     logger.info('Audio', 'MusicModule inicializado (YouTube).');
   }
 
-  private createYtdlStream(url: string): Readable {
-    const transcoder = new prism.FFmpeg({
-      args: ['-analyzeduration', '0', '-loglevel', '0', '-f', 's16le', '-ar', '48000', '-ac', '2'],
-      shell: false,
+  private normalizeYouTubeUrl(url: string): string {
+    if (!url || typeof url !== 'string') return url;
+    const trimmed = url.trim();
+    if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) return trimmed;
+    const id = trimmed.replace(/^.*[?&]v=([^&]+).*$/, '$1').replace(/^\/watch\?v=/, '') || trimmed;
+    return `https://www.youtube.com/watch?v=${id}`;
+  }
+
+  private createYouTubeStream(url: string): Readable {
+    const fullUrl = this.normalizeYouTubeUrl(url);
+    return ytdl(fullUrl, {
+      filter: 'audioonly',
+      quality: 'highestaudio',
+      highWaterMark: 1024 * 512,
+      playerClients: ['ANDROID', 'WEB_EMBEDDED', 'WEB'],
     });
-    const input = ytdl(url, { filter: 'audioonly' });
-    input.on('error', () => transcoder.destroy());
-    return input.pipe(transcoder);
   }
 
   private async resolveQuery(query: string): Promise<IMusicQueueItem[]> {
@@ -45,8 +52,15 @@ export class MusicModule {
       try {
         const video = await YouTube.getVideo(trimmed);
         if (!video?.url) throw new Error('Vídeo não encontrado');
-        return [{ url: video.url, name: video.title ?? 'Desconhecido', type: 'youtube' }];
-      } catch {
+        const url = this.normalizeYouTubeUrl((video as { url: string }).url);
+        return [
+          { url, name: (video as { title?: string }).title ?? 'Desconhecido', type: 'youtube' },
+        ];
+      } catch (e) {
+        logger.error(
+          'Music',
+          `resolveQuery.getVideo falhou: ${e instanceof Error ? e.message : e}${e instanceof Error && e.stack ? `\nStack: ${e.stack}` : ''}`
+        );
         throw new Error('Não foi possível obter informações do vídeo.');
       }
     }
@@ -54,8 +68,10 @@ export class MusicModule {
       try {
         const playlist = await YouTube.getPlaylist(trimmed, { fetchAll: false });
         if (!playlist?.videos?.length) throw new Error('Playlist vazia ou não encontrada');
-        return playlist.videos.map((v: { url: string; title?: string }) => ({
-          url: v.url,
+        return playlist.videos.map((v: { url: string; id?: string; title?: string }) => ({
+          url: this.normalizeYouTubeUrl(
+            v.url || (v.id ? `https://www.youtube.com/watch?v=${v.id}` : '')
+          ),
           name: v.title ?? 'Desconhecido',
           type: 'youtube' as const,
         }));
@@ -65,9 +81,18 @@ export class MusicModule {
     }
     try {
       const video = await YouTube.searchOne(trimmed, 'video');
-      if (!video?.url) throw new Error('Nenhum resultado encontrado');
-      return [{ url: video.url, name: video.title ?? 'Desconhecido', type: 'youtube' }];
-    } catch {
+      const rawUrl = (video as { url?: string })?.url;
+      const rawId = (video as { id?: string })?.id;
+      if (!rawUrl && !rawId) throw new Error('Nenhum resultado encontrado');
+      const url = this.normalizeYouTubeUrl(rawUrl || `https://www.youtube.com/watch?v=${rawId}`);
+      return [
+        { url, name: (video as { title?: string }).title ?? 'Desconhecido', type: 'youtube' },
+      ];
+    } catch (e) {
+      logger.error(
+        'Music',
+        `resolveQuery.searchOne falhou: ${e instanceof Error ? e.message : e}${e instanceof Error && e.stack ? `\nStack: ${e.stack}` : ''}`
+      );
       throw new Error('Nenhum resultado encontrado para a busca.');
     }
   }
@@ -98,7 +123,7 @@ export class MusicModule {
           vol
         );
       } else {
-        const stream = this.createYtdlStream(item.url);
+        const stream = this.createYouTubeStream(item.url);
         stream.on('error', () => {
           logger.error('Music', `Erro no stream: ${item.name}`);
           this.playNext(guildId);
@@ -113,7 +138,11 @@ export class MusicModule {
       }
       logger.info('Music', `Tocando: ${item.name}`);
     } catch (err) {
-      logger.error('Music', `Erro ao tocar ${item.name}: ${err}`);
+      const errMsg = err instanceof Error ? err.message : String(err);
+      const errStack = err instanceof Error ? err.stack : '';
+      logger.error('Music', `Erro ao tocar "${item.name}": ${errMsg}`);
+      logger.error('Music', `URL que causou o erro: "${item.url}" (type=${item.type})`);
+      if (errStack) logger.error('Music', `Stack: ${errStack}`);
       this.playNext(guildId);
     }
   }

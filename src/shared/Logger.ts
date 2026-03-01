@@ -12,7 +12,6 @@ export class Logger {
   }
 
   startup(msg: unknown): void {
-    if (!this.isDebug) return;
     console.log(colors.cyan('[STARTUP]'), msg);
   }
 

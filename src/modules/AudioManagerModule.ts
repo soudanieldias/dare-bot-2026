@@ -83,7 +83,7 @@ export class AudioManagerModule {
     volume?: number
   ): void {
     const player = this.getOrCreatePlayer(guildId, channelId, adapterCreator);
-    const vol = volume ?? this.volumeMap.get(guildId) ?? 0.5;
+    const vol = volume ?? this.volumeMap.get(guildId) ?? 0.1;
     const resource = createAudioResource(url, { inlineVolume: true });
     resource.volume?.setVolume(vol);
     this.resourceMap.set(guildId, resource);
@@ -98,7 +98,7 @@ export class AudioManagerModule {
     volume?: number
   ): void {
     const player = this.getOrCreatePlayer(guildId, channelId, adapterCreator);
-    const vol = volume ?? this.volumeMap.get(guildId) ?? 0.5;
+    const vol = volume ?? this.volumeMap.get(guildId) ?? 0.1;
     const resource = createAudioResource(stream, { inlineVolume: true });
     resource.volume?.setVolume(vol);
     this.resourceMap.set(guildId, resource);
@@ -115,7 +115,7 @@ export class AudioManagerModule {
   }
 
   public getVolume(guildId: string): number {
-    return this.volumeMap.get(guildId) ?? 0.5;
+    return this.volumeMap.get(guildId) ?? 0.1;
   }
 
   public setMusicOnIdleCallback(cb: MusicOnIdleCallback): void {
@@ -160,7 +160,7 @@ export class AudioManagerModule {
     const nextItem = queue.shift();
     if (nextItem) {
       const resource = createAudioResource(nextItem.source, { inlineVolume: true });
-      const vol = this.volumeMap.get(guildId) ?? 0.5;
+      const vol = this.volumeMap.get(guildId) ?? 0.1;
       resource.volume?.setVolume(vol);
       this.resourceMap.set(guildId, resource);
       player.play(resource);
