@@ -1,4 +1,5 @@
 import type { AudioManagerModule } from '@/modules/AudioManagerModule.js';
+import type { MusicModule } from '@/modules/MusicModule.js';
 import type { SoundModule } from '@/modules/SoundModule.js';
 import type { SoundpadModule } from '@/modules/SoundpadModule.js';
 import type { TtsModule } from '@/modules/TtsModule.js';
@@ -9,6 +10,7 @@ export interface IDareClient extends Client {
   pads?: Map<string, { name: string; path: string }>;
   audioManager: AudioManagerModule;
   soundModule: SoundModule;
+  musicModule: MusicModule;
   soundpadModule: SoundpadModule;
   ttsModule: TtsModule;
 }

@@ -17,10 +17,14 @@ interface AudioQueueItem {
   type: 'MUSIC' | 'EFFECT';
 }
 
+export type MusicOnIdleCallback = (guildId: string) => void;
+
 export class AudioManagerModule {
   private connectionMap = new Map<string, VoiceConnection>();
   private playerMap = new Map<string, AudioPlayer>();
   private queueMap = new Map<string, AudioQueueItem[]>();
+  private volumeMap = new Map<string, number>();
+  private musicOnIdleCallback?: MusicOnIdleCallback;
 
   constructor(private readonly client: IDareClient) {
     this.client.audioManager = this;
@@ -38,6 +42,10 @@ export class AudioManagerModule {
 
       player.on(AudioPlayerStatus.Idle, () => {
         this.processQueue(guildId);
+        const queue = this.queueMap.get(guildId);
+        if ((!queue || queue.length === 0) && this.musicOnIdleCallback) {
+          this.musicOnIdleCallback(guildId);
+        }
       });
 
       player.on('error', (error) => {
@@ -69,12 +77,34 @@ export class AudioManagerModule {
     guildId: string,
     channelId: string,
     adapterCreator: unknown,
-    stream: Readable
+    stream: Readable,
+    volume?: number
   ): void {
     const player = this.getOrCreatePlayer(guildId, channelId, adapterCreator);
+    const vol = volume ?? this.volumeMap.get(guildId) ?? 0.5;
     const resource = createAudioResource(stream, { inlineVolume: true });
-    resource.volume?.setVolume(0.5);
+    resource.volume?.setVolume(vol);
     player.play(resource);
+  }
+
+  public setVolume(guildId: string, volume: number): void {
+    this.volumeMap.set(guildId, Math.max(0, Math.min(1, volume)));
+  }
+
+  public getVolume(guildId: string): number {
+    return this.volumeMap.get(guildId) ?? 0.5;
+  }
+
+  public setMusicOnIdleCallback(cb: MusicOnIdleCallback): void {
+    this.musicOnIdleCallback = cb;
+  }
+
+  public skip(guildId: string): void {
+    this.playerMap.get(guildId)?.stop();
+  }
+
+  public hasPlayer(guildId: string): boolean {
+    return this.playerMap.has(guildId);
   }
 
   public async play(guildId: string, channelId: string, adapterCreator: any, item: AudioQueueItem) {
@@ -115,6 +145,7 @@ export class AudioManagerModule {
     this.connectionMap.delete(guildId);
     this.playerMap.delete(guildId);
     this.queueMap.delete(guildId);
+    this.volumeMap.delete(guildId);
     logger.info('Audio', `Recursos limpos para a guilda: ${guildId}`);
   }
 

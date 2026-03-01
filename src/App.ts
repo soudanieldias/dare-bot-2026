@@ -6,6 +6,7 @@ import {
   AudioManagerModule,
   CommandLoaderModule,
   DatabaseModule,
+  MusicModule,
   OnClientReadyModule,
   OnInteractionModule,
   OnMessageCreateModule,
@@ -86,6 +87,7 @@ export class App {
     // Initialize Sound System
     await new AudioManagerModule(this.client).bootstrap();
     await new SoundModule(this.client).bootstrap();
+    await new MusicModule(this.client).bootstrap();
     await new SoundpadModule(this.client).bootstrap();
   }
 }
