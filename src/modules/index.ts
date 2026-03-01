@@ -6,6 +6,5 @@ export * from './MusicModule.js';
 export * from './OnClientReadyModule.js';
 export * from './OnInteractionModule.js';
 export * from './OnMessageCreateModule.js';
-export * from './SoundModule.js';
 export * from './SoundpadModule.js';
 export * from './TtsModule.js';

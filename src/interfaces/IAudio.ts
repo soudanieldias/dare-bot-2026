@@ -5,3 +5,14 @@ export interface AudioQueueItem {
   name: string;
   type: AudioType;
 }
+
+export interface IConnectionParams {
+  channelId: string;
+  guildId: string;
+  adapterCreator: unknown;
+}
+
+export interface IPadInfo {
+  name: string;
+  path: string;
+}

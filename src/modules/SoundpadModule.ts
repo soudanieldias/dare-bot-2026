@@ -2,6 +2,7 @@ import { readdirSync } from 'fs';
 import { join, extname, relative } from 'path';
 import { Events, MessageFlags, ActionRowBuilder, ButtonBuilder, ButtonStyle } from 'discord.js';
 import type { IDareClient } from '@/interfaces/IDareClient.js';
+import type { ConnectionParams, PadInfo } from '@/interfaces/IAudio.js';
 import { GuildMember } from 'discord.js';
 import type {
   StringSelectMenuInteraction,
@@ -114,6 +115,22 @@ export class SoundpadModule {
     }
   }
 
+  async playPad(pad: PadInfo, params: ConnectionParams, member: GuildMember): Promise<void> {
+    const { guildId, channelId, adapterCreator } = params;
+    const existingChannelId = this.client.audioManager.getConnectionChannelId(guildId);
+    if (existingChannelId && existingChannelId !== member.voice.channel?.id) {
+      const botChannel = member.guild.channels.cache.get(existingChannelId) as VoiceChannel | undefined;
+      if (botChannel && 'members' in botChannel && botChannel.members.size > 1) {
+        throw new Error('Bot is already in another voice channel.');
+      }
+    }
+    await this.client.audioManager.play(guildId, channelId, adapterCreator, {
+      source: pad.path,
+      name: pad.name,
+      type: 'EFFECT',
+    });
+  }
+
   async handleSelectMenu(interaction: StringSelectMenuInteraction): Promise<boolean> {
     const value = interaction.values[0];
     if (!value) return false;
@@ -176,15 +193,7 @@ export class SoundpadModule {
         guildId: channel.guild.id,
         adapterCreator: channel.guild.voiceAdapterCreator,
       };
-      await this.client.soundModule.playSound(
-        { guildId: interaction.guildId, member },
-        pad,
-        params
-      );
-      // await interaction.reply({
-      //   content: `Playing: ${pad.name}`,
-      //   flags: [MessageFlags.Ephemeral],
-      // });
+      await this.playPad(pad, params, member);
       await interaction.deferUpdate();
     } catch (error) {
       await interaction.reply({

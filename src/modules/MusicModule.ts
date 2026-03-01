@@ -1,21 +1,21 @@
 import type { Readable } from 'node:stream';
 import type { GuildMember } from 'discord.js';
 import type { IDareClient } from '@/interfaces/IDareClient.js';
-import type { ConnectionParams } from './SoundModule.js';
+import type { IConnectionParams } from '@/interfaces/IAudio.js';
 import { logger } from '@/shared/index.js';
 import ytdl from 'discord-ytdl-core';
 import { YouTube } from 'youtube-sr';
 
-export interface MusicQueueItem {
+export interface IMusicQueueItem {
   url: string;
   name: string;
   type?: 'youtube' | 'arbitrary';
 }
 
 export class MusicModule {
-  private queueMap = new Map<string, MusicQueueItem[]>();
-  private currentTrackMap = new Map<string, MusicQueueItem>();
-  private connectionParamsMap = new Map<string, ConnectionParams>();
+  private queueMap = new Map<string, IMusicQueueItem[]>();
+  private currentTrackMap = new Map<string, IMusicQueueItem>();
+  private connectionParamsMap = new Map<string, IConnectionParams>();
 
   constructor(private readonly client: IDareClient) {
     this.client.musicModule = this;
@@ -43,11 +43,11 @@ export class MusicModule {
     });
   }
 
-  private async resolveQuery(query: string): Promise<MusicQueueItem[]> {
+  private async resolveQuery(query: string): Promise<IMusicQueueItem[]> {
     const trimmed = query.trim();
     if (YouTube.validate(trimmed, 'VIDEO') || YouTube.validate(trimmed, 'VIDEO_ID')) {
-    try {
-      const video = await YouTube.getVideo(trimmed);
+      try {
+        const video = await YouTube.getVideo(trimmed);
         if (!video?.url) throw new Error('Vídeo não encontrado');
         return [{ url: video.url, name: video.title ?? 'Desconhecido', type: 'youtube' }];
       } catch {
@@ -76,7 +76,7 @@ export class MusicModule {
     }
   }
 
-  private async playNext(guildId: string, params?: ConnectionParams): Promise<void> {
+  private async playNext(guildId: string, params?: IConnectionParams): Promise<void> {
     const queue = this.queueMap.get(guildId);
     if (!queue || queue.length === 0) {
       this.currentTrackMap.delete(guildId);
@@ -116,7 +116,7 @@ export class MusicModule {
   }
 
   async play(
-    params: ConnectionParams,
+    params: IConnectionParams,
     member: GuildMember,
     query: string,
     isFile = false
@@ -129,7 +129,7 @@ export class MusicModule {
       throw new Error('O bot já está em outro canal de voz.');
     }
 
-    let items: MusicQueueItem[];
+    let items: IMusicQueueItem[];
 
     if (isFile) {
       items = [{ url: query, name: query.split('/').pop() ?? 'Arquivo', type: 'arbitrary' }];
@@ -173,7 +173,7 @@ export class MusicModule {
     this.client.audioManager.skip(guildId);
   }
 
-  getQueue(guildId: string): { current: MusicQueueItem | null; queue: MusicQueueItem[] } {
+  getQueue(guildId: string): { current: IMusicQueueItem | null; queue: MusicQueueItem[] } {
     const current = this.currentTrackMap.get(guildId) ?? null;
     const queue = this.queueMap.get(guildId) ?? [];
     return { current, queue };

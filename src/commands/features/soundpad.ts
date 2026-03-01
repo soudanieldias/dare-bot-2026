@@ -96,7 +96,7 @@ export const soundpadCommand: ICommand = {
           mem = await guild.members.fetch(interaction.user.id).catch(() => null);
         }
         if (!mem) throw new Error('Member not found');
-        await client.soundModule.playSound({ guildId: guild.id, member: mem }, pad, connectionParams);
+        await client.soundpadModule.playPad(pad, connectionParams, mem);
       } catch (error) {
         await interaction.followUp({
           content: error instanceof Error ? error.message : 'Erro ao tocar o áudio.',
