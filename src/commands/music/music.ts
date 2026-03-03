@@ -11,16 +11,16 @@ import type { ICommand } from '@/interfaces/ICommand.js';
 export const musicCommand: ICommand = {
   data: new SlashCommandBuilder()
     .setName('music')
-    .setDescription('Sistema de Música DARE-Music (YouTube)')
+    .setDescription('Sistema de Música DARE-Music (playfile disponível)')
     .setDefaultMemberPermissions(PermissionFlagsBits.UseApplicationCommands)
     .addSubcommand((sc) =>
       sc
         .setName('play')
-        .setDescription('Toca uma música ou playlist do YouTube')
+        .setDescription('Toca uma música do YouTube (em implementação)')
         .addStringOption((opt) =>
           opt
             .setName('query')
-            .setDescription('Nome, link do vídeo ou playlist do YouTube')
+            .setDescription('Link ou nome do vídeo do YouTube')
             .setRequired(true)
         )
     )

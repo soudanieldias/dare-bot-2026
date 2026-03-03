@@ -1,15 +1,12 @@
-import type { Readable } from 'node:stream';
 import type { GuildMember } from 'discord.js';
 import type { IDareClient } from '@/interfaces/IDareClient.js';
 import type { IConnectionParams } from '@/interfaces/IAudio.js';
 import { logger } from '@/shared/index.js';
-import ytdl from '@distube/ytdl-core';
-import { YouTube } from 'youtube-sr';
 
 export interface IMusicQueueItem {
   url: string;
   name: string;
-  type?: 'youtube' | 'arbitrary';
+  type: 'arbitrary';
 }
 
 export class MusicModule {
@@ -25,76 +22,7 @@ export class MusicModule {
     this.client.audioManager.setMusicOnIdleCallback((guildId) => {
       this.playNext(guildId);
     });
-    logger.info('Audio', 'MusicModule inicializado (YouTube).');
-  }
-
-  private normalizeYouTubeUrl(url: string): string {
-    if (!url || typeof url !== 'string') return url;
-    const trimmed = url.trim();
-    if (trimmed.startsWith('http://') || trimmed.startsWith('https://')) return trimmed;
-    const id = trimmed.replace(/^.*[?&]v=([^&]+).*$/, '$1').replace(/^\/watch\?v=/, '') || trimmed;
-    return `https://www.youtube.com/watch?v=${id}`;
-  }
-
-  private createYouTubeStream(url: string): Readable {
-    const fullUrl = this.normalizeYouTubeUrl(url);
-    return ytdl(fullUrl, {
-      filter: 'audioonly',
-      quality: 'highestaudio',
-      highWaterMark: 1024 * 512,
-      playerClients: ['ANDROID', 'WEB_EMBEDDED', 'WEB'],
-    });
-  }
-
-  private async resolveQuery(query: string): Promise<IMusicQueueItem[]> {
-    const trimmed = query.trim();
-    if (YouTube.validate(trimmed, 'VIDEO') || YouTube.validate(trimmed, 'VIDEO_ID')) {
-      try {
-        const video = await YouTube.getVideo(trimmed);
-        if (!video?.url) throw new Error('Vídeo não encontrado');
-        const url = this.normalizeYouTubeUrl((video as { url: string }).url);
-        return [
-          { url, name: (video as { title?: string }).title ?? 'Desconhecido', type: 'youtube' },
-        ];
-      } catch (e) {
-        logger.error(
-          'Music',
-          `resolveQuery.getVideo falhou: ${e instanceof Error ? e.message : e}${e instanceof Error && e.stack ? `\nStack: ${e.stack}` : ''}`
-        );
-        throw new Error('Não foi possível obter informações do vídeo.');
-      }
-    }
-    if (YouTube.isPlaylist(trimmed)) {
-      try {
-        const playlist = await YouTube.getPlaylist(trimmed, { fetchAll: false });
-        if (!playlist?.videos?.length) throw new Error('Playlist vazia ou não encontrada');
-        return playlist.videos.map((v: { url: string; id?: string; title?: string }) => ({
-          url: this.normalizeYouTubeUrl(
-            v.url || (v.id ? `https://www.youtube.com/watch?v=${v.id}` : '')
-          ),
-          name: v.title ?? 'Desconhecido',
-          type: 'youtube' as const,
-        }));
-      } catch {
-        throw new Error('Não foi possível obter a playlist.');
-      }
-    }
-    try {
-      const video = await YouTube.searchOne(trimmed, 'video');
-      const rawUrl = (video as { url?: string })?.url;
-      const rawId = (video as { id?: string })?.id;
-      if (!rawUrl && !rawId) throw new Error('Nenhum resultado encontrado');
-      const url = this.normalizeYouTubeUrl(rawUrl || `https://www.youtube.com/watch?v=${rawId}`);
-      return [
-        { url, name: (video as { title?: string }).title ?? 'Desconhecido', type: 'youtube' },
-      ];
-    } catch (e) {
-      logger.error(
-        'Music',
-        `resolveQuery.searchOne falhou: ${e instanceof Error ? e.message : e}${e instanceof Error && e.stack ? `\nStack: ${e.stack}` : ''}`
-      );
-      throw new Error('Nenhum resultado encontrado para a busca.');
-    }
+    logger.info('Audio', 'MusicModule inicializado (playfile).');
   }
 
   private async playNext(guildId: string, params?: IConnectionParams): Promise<void> {
@@ -114,35 +42,17 @@ export class MusicModule {
 
     try {
       const vol = this.client.audioManager.getVolume(guildId);
-      if (item.type === 'arbitrary') {
-        this.client.audioManager.playFromUrl(
-          guildId,
-          connParams.channelId,
-          connParams.adapterCreator,
-          item.url,
-          vol
-        );
-      } else {
-        const stream = this.createYouTubeStream(item.url);
-        stream.on('error', () => {
-          logger.error('Music', `Erro no stream: ${item.name}`);
-          this.playNext(guildId);
-        });
-        this.client.audioManager.playFromStream(
-          guildId,
-          connParams.channelId,
-          connParams.adapterCreator,
-          stream,
-          vol
-        );
-      }
+      this.client.audioManager.playFromUrl(
+        guildId,
+        connParams.channelId,
+        connParams.adapterCreator,
+        item.url,
+        vol
+      );
       logger.info('Music', `Tocando: ${item.name}`);
     } catch (err) {
       const errMsg = err instanceof Error ? err.message : String(err);
-      const errStack = err instanceof Error ? err.stack : '';
       logger.error('Music', `Erro ao tocar "${item.name}": ${errMsg}`);
-      logger.error('Music', `URL que causou o erro: "${item.url}" (type=${item.type})`);
-      if (errStack) logger.error('Music', `Stack: ${errStack}`);
       this.playNext(guildId);
     }
   }
@@ -161,13 +71,13 @@ export class MusicModule {
       throw new Error('O bot já está em outro canal de voz.');
     }
 
-    let items: IMusicQueueItem[];
-
-    if (isFile) {
-      items = [{ url: query, name: query.split('/').pop() ?? 'Arquivo', type: 'arbitrary' }];
-    } else {
-      items = await this.resolveQuery(query);
+    if (!isFile) {
+      throw new Error('YouTube está em implementação. Use /music playfile com link de áudio (mp3, mp4, etc.).');
     }
+
+    const items: IMusicQueueItem[] = [
+      { url: query, name: query.split('/').pop() ?? 'Arquivo', type: 'arbitrary' },
+    ];
 
     const queue = this.queueMap.get(guildId) ?? [];
     for (const item of items) {
@@ -180,17 +90,9 @@ export class MusicModule {
       await this.playNext(guildId, params);
     }
 
-    if (items.length === 1) {
-      return {
-        added: 1,
-        message: items[0]!.name
-          ? `${items[0]!.name}${queue.length > 1 ? ` (${queue.length} na fila)` : ''}`
-          : 'Adicionado à fila.',
-      };
-    }
     return {
-      added: items.length,
-      message: `Playlist: ${items.length} músicas adicionadas (total: ${queue.length})`,
+      added: 1,
+      message: items[0]!.name + (queue.length > 1 ? ` (${queue.length} na fila)` : ''),
     };
   }
 
