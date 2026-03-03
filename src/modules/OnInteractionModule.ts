@@ -2,6 +2,7 @@ import { commandMap } from '@/commands/index.js';
 import { getI18n } from '@/utils/index.js';
 import type { IDareClient } from '@/interfaces/IDareClient.js';
 import { Events, MessageFlags, type Interaction } from 'discord.js';
+import { logger } from '@/shared/Logger.js';
 
 export class OnInteractionModule {
   constructor(private readonly client: IDareClient) {}
@@ -11,7 +12,6 @@ export class OnInteractionModule {
       try {
         // ChatInputCommand Handler
         if (interaction.isChatInputCommand()) {
-          console.log(`Received command: ${interaction.commandName} from ${interaction.user.tag}`);
           const command = commandMap.get(interaction.commandName);
 
           if (command) {
@@ -100,7 +100,7 @@ export class OnInteractionModule {
           });
         }
       } catch (error) {
-        console.error('Interaction error:', error);
+        logger.error('OnInteractionModule', `Interaction error: ${error}`);
       }
     });
   }
