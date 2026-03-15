@@ -45,12 +45,22 @@ export class OnInteractionModule {
 
         // Component Handlers: Buttons
         if (interaction.isButton()) {
+          if (
+            this.client.ticketModule &&
+            (await this.client.ticketModule.handleButton(interaction))
+          )
+            return;
           if (await this.client.soundpadModule.handleButton(interaction)) return;
           return;
         }
 
         // Component Handlers: Select Menus
         if (interaction.isStringSelectMenu()) {
+          if (
+            this.client.ticketModule &&
+            (await this.client.ticketModule.handleSelectMenu(interaction))
+          )
+            return;
           if (await this.client.soundpadModule.handleSelectMenu(interaction)) return;
           return;
         }
@@ -87,7 +97,11 @@ export class OnInteractionModule {
 
         // ModalSubmit Handler
         if (interaction.isModalSubmit()) {
-          // TODO: Implement modal submit logic here
+          if (
+            this.client.ticketModule &&
+            (await this.client.ticketModule.handleModalSubmit(interaction))
+          )
+            return;
           return;
         }
 

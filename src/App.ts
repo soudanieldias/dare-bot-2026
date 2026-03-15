@@ -11,6 +11,7 @@ import {
   OnInteractionModule,
   OnMessageCreateModule,
   SoundpadModule,
+  TicketModule,
 } from './modules/index.js';
 import { config, logger } from './shared/index.js';
 import { AppDataSource } from './database/DatabaseSource.js';
@@ -82,6 +83,7 @@ export class App {
     await new OnInteractionModule(this.client).bootstrap();
     await new OnMessageCreateModule(this.client).bootstrap();
     await new CommandLoaderModule(this.client).bootstrap();
+    await new TicketModule(this.client).bootstrap();
 
     // Initialize Audio System (core) + Music + Soundpad
     await new AudioManagerModule(this.client).bootstrap();

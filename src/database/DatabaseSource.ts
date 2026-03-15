@@ -1,7 +1,7 @@
 import 'reflect-metadata';
 import { DataSource } from 'typeorm';
 import 'dotenv/config';
-import { Guild, User, Member, GuildSettings } from '@/database/entities/index.js';
+import { Guild, User, Member, GuildSettings, Ticket } from './entities/index.js';
 
 export const AppDataSource = new DataSource({
   type: process.env.DATABASE_TYPE ?? 'postgres',
@@ -13,8 +13,11 @@ export const AppDataSource = new DataSource({
   url: process.env.DATABASE_URL,
   synchronize: process.env.NODE_ENV !== 'production',
   logging: process.env.DATABASE_LOGGING === 'true',
-  entities: [Guild, User, Member, GuildSettings],
-  migrations: ['src/database/migrations/*.ts'],
+  entities: [Guild, User, Member, GuildSettings, Ticket],
+  migrations: ['dist/database/migrations/*.js'],
   subscribers: [],
-  extra: { connectTimeout: 10_000 },
+  extra: {
+    connectTimeout: 10_000,
+    ...(process.env.DATABASE_TYPE === 'mysql' ? { charset: 'utf8mb4' } : {}),
+  },
 });

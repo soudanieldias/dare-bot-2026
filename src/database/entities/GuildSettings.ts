@@ -51,6 +51,13 @@ export class GuildSettings {
   suggestionsChannelId!: string | null;
   @Column({ type: 'varchar', length: 255, nullable: true })
   modRoleId!: string | null;
+  @Column({ type: 'varchar', length: 255, nullable: true })
+  mentionRoleId!: string | null;
+
+  @Column({ type: 'varchar', length: 32, nullable: true })
+  ticketInteractionType!: string | null;
+  @Column({ type: 'json', nullable: true })
+  ticketCategoriesJson!: Array<{ id: string; name: string; emoji: string; description?: string; color?: string }> | null;
 
   /** Creation and update dates */
   @CreateDateColumn()

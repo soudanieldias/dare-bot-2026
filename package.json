@@ -12,16 +12,17 @@
     "build": "tsc && tsc-alias",
     "start": "node dist/index.js",
     "typeorm": "typeorm-ts-node-commonjs",
-    "db:migrate": "npm run typeorm -- migration:run -d src/database/data-source.ts",
-    "db:migrate:generate": "npm run typeorm -- migration:generate -d src/database/data-source.ts",
-    "db:migrate:revert": "npm run typeorm -- migration:revert -d src/database/data-source.ts",
-    "db:schema:sync": "npm run typeorm -- schema:sync -d src/database/data-source.ts"
+    "db:migrate": "pnpm build && node ./node_modules/typeorm/cli.js migration:run -d dist/database/DatabaseSource.js",
+    "db:migrate:generate": "pnpm build && node ./node_modules/typeorm/cli.js migration:generate -d dist/database/DatabaseSource.js",
+    "db:migrate:revert": "node ./node_modules/typeorm/cli.js migration:revert -d dist/database/DatabaseSource.js",
+    "db:schema:sync": "pnpm build && node ./node_modules/typeorm/cli.js schema:sync -d dist/database/DatabaseSource.js"
   },
   "dependencies": {
     "@discordjs/voice": "^0.19.0",
     "@distube/ytdl-core": "^4.16.12",
     "@snazzah/davey": "^0.1.9",
     "colors": "^1.4.0",
+    "discord-html-transcripts": "^3.2.0",
     "discord-tts": "^1.2.2",
     "discord.js": "^14.25.1",
     "dotenv": "^17.3.1",
@@ -34,6 +35,7 @@
     "play-dl": "^1.9.7",
     "prism-media": "^1.3.5",
     "reflect-metadata": "^0.2.2",
+    "ts-node": "^10.9.2",
     "typeorm": "^0.3.28",
     "youtube-sr": "^4.3.12",
     "youtubei.js": "^16.0.1"

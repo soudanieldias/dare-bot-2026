@@ -7,4 +7,5 @@ export * from './OnClientReadyModule.js';
 export * from './OnInteractionModule.js';
 export * from './OnMessageCreateModule.js';
 export * from './SoundpadModule.js';
+export { TicketModule } from './ticket/index.js';
 export * from './TtsModule.js';
