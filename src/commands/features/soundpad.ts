@@ -26,18 +26,22 @@ export const soundpadCommand: ICommand = {
     .setName('soundpad')
     .setDescription('Comandos de SoundPad')
     .setDefaultMemberPermissions(PermissionFlagsBits.UseApplicationCommands)
-    .addSubcommand((sc) =>
-      sc.setName('list').setDescription('Lista áudios por categoria (menu)')
-    )
+    .addSubcommand((sc) => sc.setName('list').setDescription('Lista áudios por categoria (menu)'))
     .addSubcommand((sc) =>
       sc.setName('list-all').setDescription('Lista todos os áudios de uma vez')
     )
+    .addSubcommand((sc) => sc.setName('play').setDescription('Toca o áudio selecionado'))
     .addSubcommand((sc) =>
       sc
-        .setName('play')
-        .setDescription('Toca o áudio selecionado')
+        .setName('reload')
+        .setDescription('Recarrega os pads do SoundPad')
         .addStringOption((opt) =>
-          opt.setName('filepath').setDescription('Nome ou caminho do arquivo de áudio').setRequired(true)
+          opt
+            .setName('category')
+            .setDescription('Categoria específica para recarregar (opcional)')
+            .addChoices(
+              ...SOUNDPAD_CATEGORIES.map((cat) => ({ name: cat.label, value: cat.value }))
+            )
         )
     ) as ICommand['data'],
 
@@ -147,6 +151,21 @@ export const soundpadCommand: ICommand = {
             components: [row],
           });
         }
+      }
+    }
+
+    if (subCommand === 'reload-pads') {
+      try {
+        client.soundpadModule.loadPads(client);
+        interaction.reply({
+          content: 'Pads recarregados com sucesso!',
+          flags: [MessageFlags.Ephemeral],
+        });
+      } catch (error) {
+        await interaction.reply({
+          content: error instanceof Error ? error.message : 'Erro ao recarregar os pads.',
+          flags: [MessageFlags.Ephemeral],
+        });
       }
     }
   },

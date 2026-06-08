@@ -94,7 +94,7 @@ export class SoundpadModule {
     });
   }
 
-  private loadPads(client: IDareClient): void {
+  loadPads(client: IDareClient): void {
     logger.info('Soundpad', 'Loading soundpads...');
     try {
       const files = findMp3InDir(AUDIOS_BASE);
