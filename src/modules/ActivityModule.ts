@@ -8,8 +8,9 @@ export class ActivityModule {
   bootstrap(): void {
     this.client.once('clientReady', () => {
       logger.info('Activity', 'Inicializando Activity do BOT.');
-      this.client.user?.setActivity(config.discord.activityText, {
-        type: config.discord.activityType as unknown as ActivityType,
+      this.client.user?.setActivity({
+        type: Math.random() < 0.5 ? ActivityType.Playing : ActivityType.Custom,
+        name: config.discord.activityText as string,
         url: 'https://diasitservices.com.br/',
       });
       this.client.user?.setPresence({ status: 'online' });
