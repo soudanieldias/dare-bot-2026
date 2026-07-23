@@ -30,7 +30,14 @@ export const soundpadCommand: ICommand = {
     .addSubcommand((sc) =>
       sc.setName('list-all').setDescription('Lista todos os áudios de uma vez')
     )
-    .addSubcommand((sc) => sc.setName('play').setDescription('Toca o áudio selecionado'))
+    .addSubcommand((sc) =>
+      sc
+        .setName('play')
+        .setDescription('Toca o áudio selecionado')
+        .addStringOption((opt) =>
+          opt.setName('filepath').setDescription('Caminho do arquivo de áudio').setRequired(true)
+        )
+    )
     .addSubcommand((sc) =>
       sc
         .setName('reload')
@@ -154,9 +161,9 @@ export const soundpadCommand: ICommand = {
       }
     }
 
-    if (subCommand === 'reload-pads') {
+    if (subCommand === 'reload') {
       try {
-        client.soundpadModule.loadPads(client);
+        client.soundpadModule.loadPads(client, true);
         interaction.reply({
           content: 'Pads recarregados com sucesso!',
           flags: [MessageFlags.Ephemeral],

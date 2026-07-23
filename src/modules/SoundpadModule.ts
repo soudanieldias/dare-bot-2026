@@ -94,7 +94,7 @@ export class SoundpadModule {
     });
   }
 
-  loadPads(client: IDareClient): void {
+  loadPads(client: IDareClient, isReloading = false): void {
     logger.info('Soundpad', 'Loading soundpads...');
     try {
       const files = findMp3InDir(AUDIOS_BASE);
@@ -104,7 +104,7 @@ export class SoundpadModule {
         const name = key.split('/').pop() ?? key;
         if (!client.pads?.has(key)) {
           client.pads?.set(key, { name, path: file });
-        } else {
+        } else if (!isReloading) {
           logger.warn('Soundpad', `Duplicate key ignored: "${key}" (${file})`);
         }
       }

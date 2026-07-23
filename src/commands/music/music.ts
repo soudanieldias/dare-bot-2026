@@ -18,17 +18,14 @@ export const musicCommand: ICommand = {
         .setName('play')
         .setDescription('Toca uma música do YouTube (em implementação)')
         .addStringOption((opt) =>
-          opt
-            .setName('query')
-            .setDescription('Link ou nome do vídeo do YouTube')
-            .setRequired(true)
+          opt.setName('query').setDescription('Link ou nome do vídeo do YouTube').setRequired(true)
         )
     )
     .addSubcommand((sc) => sc.setName('stop').setDescription('Para a música e limpa a fila'))
+    .addSubcommand((sc) => sc.setName('pause').setDescription('Pausa a música'))
+    .addSubcommand((sc) => sc.setName('resume').setDescription('Retoma a música'))
     .addSubcommand((sc) => sc.setName('next').setDescription('Pula para a próxima música'))
-    .addSubcommand((sc) =>
-      sc.setName('queue').setDescription('Mostra a fila atual de músicas')
-    )
+    .addSubcommand((sc) => sc.setName('queue').setDescription('Mostra a fila atual de músicas'))
     .addSubcommand((sc) =>
       sc
         .setName('volume')
@@ -47,10 +44,7 @@ export const musicCommand: ICommand = {
         .setName('playfile')
         .setDescription('Toca um áudio da internet (mp3, mp4, webm, ogg)')
         .addStringOption((opt) =>
-          opt
-            .setName('source')
-            .setDescription('Link do arquivo de áudio')
-            .setRequired(true)
+          opt.setName('source').setDescription('Link do arquivo de áudio').setRequired(true)
         )
     ) as ICommand['data'],
 
@@ -89,103 +83,108 @@ export const musicCommand: ICommand = {
     const subCommand = interaction.options.getSubcommand();
 
     try {
-      if (subCommand === 'play') {
-        const query = interaction.options.getString('query', true);
-        const mem = await resolveMember(member, guild, interaction.user.id);
-        if (!mem) throw new Error('Membro não encontrado');
+      switch (subCommand) {
+        case 'play': {
+          const query = interaction.options.getString('query', true);
+          const mem = await resolveMember(member, guild, interaction.user.id);
+          if (!mem) throw new Error('Membro não encontrado');
 
-        await interaction.deferReply({ flags: [MessageFlags.Ephemeral] });
+          await interaction.deferReply({ flags: [MessageFlags.Ephemeral] });
 
-        const { added, message } = await client.musicModule.play(
-          connectionParams,
-          mem,
-          query,
-          false
-        );
-        await interaction.editReply({
-          content: added > 0 ? `▶️ ${message}` : message,
-        });
-        return;
-      }
+          const { added, message } = await client.musicModule.play(
+            connectionParams,
+            mem,
+            query,
+            false
+          );
+          await interaction.editReply({
+            content: added > 0 ? `▶️ ${message}` : message,
+          });
+          return;
+        }
 
-      if (subCommand === 'stop') {
-        client.musicModule.stop(guild.id);
-        await interaction.reply({
-          content: 'Parando música e limpando a fila...',
-          flags: [MessageFlags.Ephemeral],
-        });
-        return;
-      }
-
-      if (subCommand === 'next') {
-        client.musicModule.skip(guild.id);
-        await interaction.reply({
-          content: 'Pulando para a próxima música...',
-          flags: [MessageFlags.Ephemeral],
-        });
-        return;
-      }
-
-      if (subCommand === 'queue') {
-        const { current, queue } = client.musicModule.getQueue(guild.id);
-        if (!current && queue.length === 0) {
+        case 'stop': {
+          client.musicModule.stop(guild.id);
           await interaction.reply({
-            content: 'Nenhuma música na fila.',
+            content: 'Parando música e limpando a fila...',
             flags: [MessageFlags.Ephemeral],
           });
           return;
         }
-        const lines: string[] = [];
-        if (current) {
-          lines.push(`**Tocando agora:** ${current.name}`);
-        }
-        if (queue.length > 0) {
-          lines.push(`\n**Fila (${queue.length}):**`);
-          queue.slice(0, 10).forEach((item, i) => {
-            lines.push(`${i + 1}. ${item.name}`);
+
+        case 'next': {
+          client.musicModule.skip(guild.id);
+          await interaction.reply({
+            content: 'Pulando para a próxima música...',
+            flags: [MessageFlags.Ephemeral],
           });
-          if (queue.length > 10) {
-            lines.push(`... e mais ${queue.length - 10}`);
-          }
+          return;
         }
-        await interaction.reply({
-          content: lines.join('\n') || 'Fila vazia.',
-          flags: [MessageFlags.Ephemeral],
-        });
-        return;
-      }
 
-      if (subCommand === 'volume') {
-        const volume = interaction.options.getInteger('volume', true);
-        client.musicModule.setVolume(guild.id, volume);
-        await interaction.reply({
-          content: `Volume alterado para ${volume}%`,
-          flags: [MessageFlags.Ephemeral],
-        });
-        return;
-      }
+        case 'queue': {
+          const { current, queue } = client.musicModule.getQueue(guild.id);
+          if (!current && queue.length === 0) {
+            await interaction.reply({
+              content: 'Nenhuma música na fila.',
+              flags: [MessageFlags.Ephemeral],
+            });
+            return;
+          }
+          const lines: string[] = [];
+          if (current) {
+            lines.push(`**Tocando agora:** ${current.name}`);
+          }
+          if (queue.length > 0) {
+            lines.push(`\n**Fila (${queue.length}):**`);
+            queue.slice(0, 10).forEach((item, i) => {
+              lines.push(`${i + 1}. ${item.name}`);
+            });
+            if (queue.length > 10) {
+              lines.push(`... e mais ${queue.length - 10}`);
+            }
+          }
+          await interaction.reply({
+            content: lines.join('\n') || 'Fila vazia.',
+            flags: [MessageFlags.Ephemeral],
+          });
+          return;
+        }
 
-      if (subCommand === 'playfile') {
-        const source = interaction.options.getString('source', true);
-        const mem = await resolveMember(member, guild, interaction.user.id);
-        if (!mem) throw new Error('Membro não encontrado');
+        case 'volume': {
+          const volume = interaction.options.getInteger('volume', true);
+          client.musicModule.setVolume(guild.id, volume);
+          await interaction.reply({
+            content: `Volume alterado para ${volume}%`,
+            flags: [MessageFlags.Ephemeral],
+          });
+          return;
+        }
+        case 'playfile': {
+          const source = interaction.options.getString('source', true);
+          const mem = await resolveMember(member, guild, interaction.user.id);
+          if (!mem) throw new Error('Membro não encontrado');
 
-        await interaction.deferReply({ flags: [MessageFlags.Ephemeral] });
+          await interaction.deferReply({ flags: [MessageFlags.Ephemeral] });
 
-        const { message } = await client.musicModule.play(
-          connectionParams,
-          mem,
-          source,
-          true
-        );
-        await interaction.editReply({ content: `▶️ ${message}` });
+          const { message } = await client.musicModule.play(connectionParams, mem, source, true);
+          await interaction.editReply({ content: `▶️ ${message}` });
+          return;
+        }
+        case 'pause': {
+          return;
+        }
+        case 'resume': {
+          return;
+        }
       }
     } catch (error) {
       const msg = error instanceof Error ? error.message : 'Ocorreu um erro.';
       if (interaction.deferred) {
         await interaction.editReply({ content: `❌ ${msg}` }).catch(() => {});
       } else {
-        await interaction.reply({ content: `❌ ${msg}`, flags: [MessageFlags.Ephemeral] }).catch(() => {});
+        await interaction
+          .reply({ content: `❌ ${msg}`, flags: [MessageFlags.Ephemeral] })
+          .catch(() => {});
       }
     }
   },
