@@ -46,6 +46,17 @@ export const musicCommand: ICommand = {
         .addStringOption((opt) =>
           opt.setName('source').setDescription('Link do arquivo de áudio').setRequired(true)
         )
+    )
+    .addSubcommand((sc) =>
+      sc
+        .setName('jukebox')
+        .setDescription('Inicia uma playlist local 24/7 a partir de uma pasta')
+        .addStringOption((opt) =>
+          opt
+            .setName('folder')
+            .setDescription('Pasta com os arquivos de áudio (padrão: src/jukebox)')
+            .setRequired(false)
+        )
     ) as ICommand['data'],
 
   category: 'music',
@@ -170,10 +181,33 @@ export const musicCommand: ICommand = {
           await interaction.editReply({ content: `▶️ ${message}` });
           return;
         }
+        case 'jukebox': {
+          const folder = interaction.options.getString('folder') ?? 'src/jukebox';
+          const mem = await resolveMember(member, guild, interaction.user.id);
+          if (!mem) throw new Error('Membro não encontrado');
+
+          await interaction.deferReply({ flags: [MessageFlags.Ephemeral] });
+
+          const { message } = await client.musicModule.playJukebox(connectionParams, mem, folder);
+          await interaction.editReply({ content: `▶️ ${message}` });
+          return;
+        }
         case 'pause': {
+          const paused = client.musicModule.pause(guild.id);
+          await interaction.reply({
+            content: paused ? '⏸️ Música pausada.' : 'Não foi possível pausar a música no momento.',
+            flags: [MessageFlags.Ephemeral],
+          });
           return;
         }
         case 'resume': {
+          const resumed = client.musicModule.resume(guild.id);
+          await interaction.reply({
+            content: resumed
+              ? '▶️ Música retomada.'
+              : 'Não foi possível retomar a música no momento.',
+            flags: [MessageFlags.Ephemeral],
+          });
           return;
         }
       }

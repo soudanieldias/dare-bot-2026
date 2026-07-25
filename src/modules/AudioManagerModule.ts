@@ -68,6 +68,17 @@ export class AudioManagerModule {
       this.connectionMap.set(guildId, connection);
 
       connection.on(VoiceConnectionStatus.Disconnected, () => {
+        logger.warn('Audio', `Conexão de voz desconectada para a guilda ${guildId}.`);
+        this.cleanup(guildId);
+      });
+
+      connection.on(VoiceConnectionStatus.Destroyed, () => {
+        logger.warn('Audio', `Conexão de voz destruída para a guilda ${guildId}.`);
+        this.cleanup(guildId);
+      });
+
+      connection.on('error', (error: Error) => {
+        logger.error('Audio', `Erro na conexão de voz da guilda ${guildId}: ${error.message}`);
         this.cleanup(guildId);
       });
     }
@@ -126,6 +137,20 @@ export class AudioManagerModule {
     this.playerMap.get(guildId)?.stop();
   }
 
+  public pause(guildId: string): boolean {
+    const player = this.playerMap.get(guildId);
+    if (!player) return false;
+    player.pause();
+    return true;
+  }
+
+  public resume(guildId: string): boolean {
+    const player = this.playerMap.get(guildId);
+    if (!player) return false;
+    player.unpause();
+    return true;
+  }
+
   public hasPlayer(guildId: string): boolean {
     return this.playerMap.has(guildId);
   }
@@ -169,7 +194,15 @@ export class AudioManagerModule {
   }
 
   private cleanup(guildId: string) {
-    this.connectionMap.get(guildId)?.destroy();
+    const connection = this.connectionMap.get(guildId);
+    if (connection) {
+      try {
+        connection.destroy();
+      } catch {
+        // ignore cleanup failures
+      }
+    }
+
     this.connectionMap.delete(guildId);
     this.playerMap.delete(guildId);
     this.queueMap.delete(guildId);
