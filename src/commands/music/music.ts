@@ -8,6 +8,8 @@ import {
 import type { IDareClient } from '@/interfaces/IDareClient.js';
 import type { ICommand } from '@/interfaces/ICommand.js';
 
+import path from 'node:path';
+
 export const musicCommand: ICommand = {
   data: new SlashCommandBuilder()
     .setName('music')
@@ -53,9 +55,10 @@ export const musicCommand: ICommand = {
         .setDescription('Inicia uma playlist local 24/7 a partir de uma pasta')
         .addStringOption((opt) =>
           opt
-            .setName('folder')
-            .setDescription('Pasta com os arquivos de áudio (padrão: src/jukebox)')
-            .setRequired(false)
+            .setName('category')
+            .setDescription('Categoria da jukebox')
+            .setRequired(true)
+            .setAutocomplete(true)
         )
     ) as ICommand['data'],
 
@@ -182,7 +185,9 @@ export const musicCommand: ICommand = {
           return;
         }
         case 'jukebox': {
-          const folder = interaction.options.getString('folder') ?? 'src/jukebox';
+          const category = interaction.options.getString('category', true);
+          const folder = path.join(client.settings.jukeboxRoot, category);
+
           const mem = await resolveMember(member, guild, interaction.user.id);
           if (!mem) throw new Error('Membro não encontrado');
 

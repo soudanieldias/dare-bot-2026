@@ -3,6 +3,7 @@ import { getI18n } from '@/utils/index.js';
 import type { IDareClient } from '@/interfaces/IDareClient.js';
 import { Events, MessageFlags, type Interaction } from 'discord.js';
 import { logger } from '@/shared/Logger.js';
+import { getJukeboxCategories } from '@/modules/MusicModule.js';
 
 export class OnInteractionModule {
   constructor(private readonly client: IDareClient) {}
@@ -22,7 +23,25 @@ export class OnInteractionModule {
 
         // Autocomplete Handler
         if (interaction.isAutocomplete()) {
-          // TODO: Implement autocomplete logic here
+          const { commandName, options } = interaction;
+
+          if (commandName === 'music' && options.getSubcommand() === 'jukebox') {
+            const focused = options.getFocused();
+
+            const categories = await getJukeboxCategories();
+
+            const filtered = categories
+              .filter((category) => category.toLowerCase().includes(focused.toLowerCase()))
+              .slice(0, 25);
+
+            await interaction.respond(
+              filtered.map((category) => ({
+                name: category,
+                value: category,
+              }))
+            );
+          }
+
           return;
         }
 

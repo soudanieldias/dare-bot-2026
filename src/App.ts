@@ -10,6 +10,7 @@ import {
   OnClientReadyModule,
   OnInteractionModule,
   OnMessageCreateModule,
+  SettingsModule,
   SoundpadModule,
   TicketModule,
 } from './modules/index.js';
@@ -84,6 +85,7 @@ export class App {
     await new OnMessageCreateModule(this.client).bootstrap();
     await new CommandLoaderModule(this.client).bootstrap();
     await new TicketModule(this.client).bootstrap();
+    await new SettingsModule(this.client).bootstrap();
 
     // Initialize Audio System (core) + Music + Soundpad
     await new AudioManagerModule(this.client).bootstrap();

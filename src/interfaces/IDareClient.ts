@@ -2,6 +2,7 @@ import type {
   AudioManagerModule,
   EmbedModule,
   MusicModule,
+  SettingsModule,
   SoundpadModule,
   TicketModule,
   TtsModule,
@@ -17,4 +18,5 @@ export interface IDareClient extends Client {
   soundpadModule: SoundpadModule;
   ticketModule?: TicketModule;
   ttsModule: TtsModule;
+  settings: SettingsModule;
 }

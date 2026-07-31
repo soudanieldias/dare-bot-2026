@@ -5,6 +5,8 @@ import type { IDareClient } from '@/interfaces/IDareClient.js';
 import type { IConnectionParams } from '@/interfaces/IAudio.js';
 import { logger } from '@/shared/index.js';
 
+export const JUKEBOX_ROOT = path.resolve('src/jukebox');
+
 export interface IMusicQueueItem {
   url: string;
   name: string;
@@ -15,6 +17,17 @@ interface IJukeboxState {
   folderPath: string;
   history: string[];
   totalFiles: number;
+}
+
+export async function getJukeboxCategories(): Promise<string[]> {
+  const entries = await readdir(JUKEBOX_ROOT, {
+    withFileTypes: true,
+  });
+
+  return entries
+    .filter((e) => e.isDirectory())
+    .map((e) => e.name)
+    .sort((a, b) => a.localeCompare(b));
 }
 
 export async function collectJukeboxAudioFiles(folderPath: string): Promise<string[]> {
