@@ -1,5 +1,6 @@
 export * from './ActivityModule.js';
 export * from './AudioManagerModule.js';
+export * from './AutocompleteModule.js';
 export * from './CommandLoaderModule.js';
 export * from './DatabaseModule.js';
 export * from './EmbedModule.js';

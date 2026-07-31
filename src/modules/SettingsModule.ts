@@ -1,8 +1,10 @@
 import type { IDareClient } from '@/interfaces/IDareClient.js';
 
 export class SettingsModule {
-  public readonly jukeboxRoot: string = 'src/jukebox';
+  public jukeboxRoot: string = './src/jukebox';
   constructor(private readonly client: IDareClient) {}
 
-  bootstrap(): void {}
+  bootstrap(): void {
+    this.client.settings = this;
+  }
 }

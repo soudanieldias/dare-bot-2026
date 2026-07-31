@@ -4,6 +4,7 @@ import type { IDareClient } from './interfaces/index.js';
 import {
   ActivityModule,
   AudioManagerModule,
+  AutocompleteModule,
   CommandLoaderModule,
   DatabaseModule,
   MusicModule,
@@ -86,6 +87,7 @@ export class App {
     await new CommandLoaderModule(this.client).bootstrap();
     await new TicketModule(this.client).bootstrap();
     await new SettingsModule(this.client).bootstrap();
+    await new AutocompleteModule(this.client).bootstrap();
 
     // Initialize Audio System (core) + Music + Soundpad
     await new AudioManagerModule(this.client).bootstrap();

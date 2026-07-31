@@ -19,17 +19,6 @@ interface IJukeboxState {
   totalFiles: number;
 }
 
-export async function getJukeboxCategories(): Promise<string[]> {
-  const entries = await readdir(JUKEBOX_ROOT, {
-    withFileTypes: true,
-  });
-
-  return entries
-    .filter((e) => e.isDirectory())
-    .map((e) => e.name)
-    .sort((a, b) => a.localeCompare(b));
-}
-
 export async function collectJukeboxAudioFiles(folderPath: string): Promise<string[]> {
   const resolvedPath = path.resolve(folderPath);
 
