@@ -4,8 +4,6 @@ import type { GuildMember } from 'discord.js';
 import type { IConnectionParams, IDareClient } from '@/interfaces/index.js';
 import { logger } from '@/shared/index.js';
 
-export const JUKEBOX_ROOT = path.resolve('src/jukebox');
-
 export interface IMusicQueueItem {
   url: string;
   name: string;

@@ -5,9 +5,8 @@ import {
   type Interaction,
 } from 'discord.js';
 import type { ICommand, IDareClient } from '@/interfaces/index.js';
+import { TTS_DEFAULT_LOCALE, TTS_LANGUAGES } from '@/constants/index.js';
 import { TtsModule } from '@/modules/index.js';
-
-const TTS_LANGUAGES = 'pt-BR, pt-PT, en-US, es-ES, fr-FR, de-DE, it-IT, ja-JP';
 
 export const ttsCommand: ICommand = {
   data: new SlashCommandBuilder()
@@ -23,14 +22,14 @@ export const ttsCommand: ICommand = {
     .addStringOption((opt) =>
       opt
         .setName('language')
-        .setDescription(`Idioma/voz (padrão: pt-BR). Ex: ${TTS_LANGUAGES}`)
+        .setDescription(`Idioma/voz (padrão: ${TTS_DEFAULT_LOCALE}). Ex: ${TTS_LANGUAGES}`)
         .setRequired(false)
     ) as ICommand['data'],
 
   async execute(client: IDareClient, interaction: Interaction): Promise<void> {
     if (!interaction.isChatInputCommand()) return;
 
-    const language = interaction.options.getString('language') ?? 'pt-BR';
+    const language = interaction.options.getString('language') ?? TTS_DEFAULT_LOCALE;
     const message = interaction.options.getString('message', true);
 
     const member = interaction.member;

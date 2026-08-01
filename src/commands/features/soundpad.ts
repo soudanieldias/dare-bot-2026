@@ -9,7 +9,8 @@ import {
   type TextChannel,
 } from 'discord.js';
 import type { ICommand, IDareClient } from '@/interfaces/index.js';
-import { SOUNDPAD_CATEGORIES, generateSoundpadButtons } from '@/modules/index.js';
+import { SOUNDPAD_CATEGORIES } from '@/constants/index.js';
+import { generateSoundpadButtons } from '@/modules/index.js';
 
 function findPad(client: IDareClient, input: string): { name: string; path: string } | undefined {
   const pad = client.pads?.get(input);

@@ -1,6 +1,6 @@
 import type { IDareClient } from '@/interfaces/index.js';
 import type { AutocompleteInteraction } from 'discord.js';
-import { JUKEBOX_ROOT } from './MusicModule.js';
+import { JUKEBOX_ROOT } from '@/constants/index.js';
 import { readdir } from 'node:fs/promises';
 
 export class AutocompleteModule {

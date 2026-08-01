@@ -1,19 +1,9 @@
 import { createRequire } from 'node:module';
+import { TTS_DEFAULT_LOCALE } from '@/constants/index.js';
 import type { IDareClient } from '@/interfaces/index.js';
 
 const require = createRequire(import.meta.url);
 const discordTTS = require('discord-tts');
-
-export const TTS_VOICES: Array<{ label: string; value: string }> = [
-  { label: 'Português (BR)', value: 'pt-BR' },
-  { label: 'Português (PT)', value: 'pt-PT' },
-  { label: 'English (US)', value: 'en-US' },
-  { label: 'Español', value: 'es-ES' },
-  { label: 'Français', value: 'fr-FR' },
-  { label: 'Deutsch', value: 'de-DE' },
-  { label: 'Italiano', value: 'it-IT' },
-  { label: '日本語', value: 'ja-JP' },
-];
 
 function localeToLang(locale: string): string {
   const lang = locale.split('-')[0];
@@ -33,7 +23,7 @@ export class TtsModule {
     this.client.ttsModule = this;
   }
 
-  playTts(params: TtsConnectionParams, text: string, locale = 'pt-BR'): void {
+  playTts(params: TtsConnectionParams, text: string, locale = TTS_DEFAULT_LOCALE): void {
     const lang = localeToLang(locale);
     const stream = discordTTS.getVoiceStream(text, { lang });
     this.client.audioManager.playFromStream(

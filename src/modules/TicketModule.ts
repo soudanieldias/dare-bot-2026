@@ -4,17 +4,12 @@ import type {
   ModalSubmitInteraction,
   StringSelectMenuInteraction,
 } from 'discord.js';
-import {
-  GuildRepository,
-  GuildSettingsRepository,
-  TicketRepository,
-} from '@/database/index.js';
+import { DEFAULT_TICKET_CATEGORIES, TICKET_CUSTOM_IDS } from '@/constants/index.js';
+import { GuildRepository, GuildSettingsRepository, TicketRepository } from '@/database/index.js';
 import type { IDareClient, ITicketCategory } from '@/interfaces/index.js';
 import { logger } from '@/shared/index.js';
 import type { IPendingConfig } from '@/types/index.js';
 import {
-  DEFAULT_TICKET_CATEGORIES,
-  TICKET_CUSTOM_IDS,
   handleAddCategoryCommand,
   handleConfigCommand,
   handleEditCategoryCommand,

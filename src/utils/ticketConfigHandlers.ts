@@ -11,11 +11,10 @@ import {
   TextInputStyle,
 } from 'discord.js';
 import type { GuildRepository, GuildSettingsRepository } from '@/database/index.js';
+import { DEFAULT_TICKET_CATEGORIES, TICKET_CUSTOM_IDS } from '@/constants/index.js';
 import type { ITicketCategory } from '@/interfaces/index.js';
 import type { IPendingConfig } from '@/types/index.js';
 import {
-  DEFAULT_TICKET_CATEGORIES,
-  TICKET_CUSTOM_IDS,
   buildSelectMenuFromCategories,
   ensureGuildExists,
   getTicketCategoriesForGuild,

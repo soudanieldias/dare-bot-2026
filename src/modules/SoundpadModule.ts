@@ -12,30 +12,15 @@ import {
   type TextChannel,
   type VoiceChannel,
 } from 'discord.js';
+import {
+  AUDIOS_DIR,
+  SOUNDPAD_BUTTONS_PER_ROW,
+  SOUNDPAD_PATHS,
+} from '@/constants/index.js';
 import type { IConnectionParams, IDareClient, IPadInfo } from '@/interfaces/index.js';
 import { logger } from '@/shared/index.js';
 
-export const SOUNDPAD_CATEGORIES: Array<{ label: string; value: string }> = [
-  { label: 'todos', value: 'spad_all' },
-  { label: 'audios', value: 'spad_audios' },
-  { label: 'frases', value: 'spad_frases' },
-  { label: 'memes', value: 'spad_memes' },
-  { label: 'musicas', value: 'spad_musicas' },
-  { label: 'times', value: 'spad_times' },
-];
-
-const SOUNDPAD_PATHS: Record<string, { path: string; category: string }> = {
-  spad_all: { path: 'src/audios', category: 'todos' },
-  spad_audios: { path: 'src/audios/audios', category: 'audios' },
-  spad_frases: { path: 'src/audios/frases', category: 'frases' },
-  spad_memes: { path: 'src/audios/memes', category: 'memes' },
-  spad_musicas: { path: 'src/audios/musicas', category: 'musicas' },
-  spad_times: { path: 'src/audios/times', category: 'times' },
-};
-
-const BUTTONS_PER_ROW = 5;
-
-const AUDIOS_BASE = join(process.cwd(), 'src/audios');
+const AUDIOS_BASE = join(process.cwd(), AUDIOS_DIR);
 
 function getPadKey(absPath: string): string {
   return relative(AUDIOS_BASE, absPath)
@@ -65,8 +50,8 @@ function generateButtons(basePath: string): ActionRowBuilder<ButtonBuilder>[] {
   const files = findMp3InDir(fullPath);
   const rows: ActionRowBuilder<ButtonBuilder>[] = [];
 
-  for (let i = 0; i < files.length; i += BUTTONS_PER_ROW) {
-    const chunk = files.slice(i, i + BUTTONS_PER_ROW);
+  for (let i = 0; i < files.length; i += SOUNDPAD_BUTTONS_PER_ROW) {
+    const chunk = files.slice(i, i + SOUNDPAD_BUTTONS_PER_ROW);
     const row = new ActionRowBuilder<ButtonBuilder>();
     for (const file of chunk) {
       const key = getPadKey(file);

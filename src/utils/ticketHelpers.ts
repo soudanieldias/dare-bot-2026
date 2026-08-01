@@ -1,66 +1,15 @@
 import { StringSelectMenuBuilder } from 'discord.js';
+import {
+  DEFAULT_TICKET_CATEGORIES,
+  TICKET_PREFIX_HYPHEN,
+  TICKET_PREFIX_UNDERSCORE,
+} from '@/constants/index.js';
 import type { ITicketCategory } from '@/interfaces/index.js';
 import type {
   TicketInteractionType,
   ICategoryPayload,
   ICategoryValidationResult,
 } from '@/types/index.js';
-
-export const TICKET_PREFIX_UNDERSCORE = 'ticket_';
-export const TICKET_PREFIX_HYPHEN = 'ticket-';
-
-export const TICKET_CUSTOM_IDS = {
-  categorySelect: 'ticket_category-select',
-  configModal: 'ticket_config-modal',
-  addCategoryModal: 'ticket_addcategory-modal',
-  removeCategorySelect: 'ticket_removecategory-select',
-  editCategorySelect: 'ticket_editcategory-select',
-  editCategoryModal: 'ticket_editcategory-modal',
-  close: 'ticket_close',
-  claim: 'ticket_claim',
-  reopen: 'ticket_reopen',
-  transcript: 'ticket_transcript',
-  mention: 'ticket_mention',
-  closeMessage: 'ticket_close-message',
-} as const;
-
-export const DEFAULT_TICKET_CATEGORIES: ITicketCategory[] = [
-  {
-    id: 'suporte',
-    name: 'Suporte',
-    emoji: '🛠️',
-    description: 'Precisa de ajuda? Abra um ticket de suporte!',
-    color: '#ff6600',
-  },
-  {
-    id: 'compras',
-    name: 'Compras',
-    emoji: '🛒',
-    description: 'Compras, vendas e pagamentos',
-    color: '#00ff00',
-  },
-  {
-    id: 'ajuda',
-    name: 'Ajuda',
-    emoji: '❓',
-    description: 'Precisa de ajuda ou suporte',
-    color: '#0099ff',
-  },
-  {
-    id: 'reclamacao',
-    name: 'Reclamação',
-    emoji: '😠',
-    description: 'Reclamações e problemas',
-    color: '#ff0000',
-  },
-  {
-    id: 'sugestao',
-    name: 'Sugestão',
-    emoji: '💡',
-    description: 'Sugestões e ideias',
-    color: '#ffff00',
-  },
-];
 
 export function isTicketInteraction(customId: string | null | undefined): boolean {
   if (!customId) return false;

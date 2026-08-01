@@ -11,8 +11,9 @@ import {
 } from 'discord.js';
 import discordTranscripts from 'discord-html-transcripts';
 import type { GuildSettingsRepository, TicketRepository } from '@/database/index.js';
+import { TICKET_CUSTOM_IDS } from '@/constants/index.js';
 import { logger } from '@/shared/index.js';
-import { TICKET_CUSTOM_IDS, getTicketCategoriesForGuild } from './ticketHelpers.js';
+import { getTicketCategoriesForGuild } from './ticketHelpers.js';
 
 export interface ITicketLifecycleDeps {
   settingsRepo: GuildSettingsRepository;
