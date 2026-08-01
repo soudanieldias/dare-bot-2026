@@ -4,7 +4,7 @@ import os from 'node:os';
 import path from 'node:path';
 import test from 'node:test';
 
-import { collectJukeboxAudioFiles, MusicModule } from '../src/modules/MusicModule.js';
+import { collectJukeboxAudioFiles, MusicModule, shuffleArray } from '../src/modules/MusicModule.js';
 
 test('collectJukeboxAudioFiles returns only supported audio files', async () => {
   const tempDir = await mkdtemp(path.join(os.tmpdir(), 'jukebox-test-'));
@@ -39,4 +39,13 @@ test('pause and resume delegate to audio manager', () => {
 
   assert.equal(module.pause('guild-1'), true);
   assert.equal(module.resume('guild-1'), true);
+});
+
+test('shuffleArray keeps the same items', () => {
+  const input = ['a', 'b', 'c', 'd', 'e'];
+  const shuffled = shuffleArray(input);
+
+  assert.equal(shuffled.length, input.length);
+  assert.deepEqual([...shuffled].sort(), [...input].sort());
+  assert.deepEqual(input, ['a', 'b', 'c', 'd', 'e']);
 });

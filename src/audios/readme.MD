@@ -1,4 +1,5 @@
 # REPORTS
+
 ## Nessa pasta se encontram todos os arquivos de áudio utilizados pelo BOT
 
 - Este diretório é necessário para que o sistema do soundpad funcione corretamente, favor não Apagá-lo!

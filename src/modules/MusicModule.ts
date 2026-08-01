@@ -4,6 +4,8 @@ import type { GuildMember } from 'discord.js';
 import type { IConnectionParams, IDareClient } from '@/interfaces/index.js';
 import { logger } from '@/shared/index.js';
 
+export type JukeboxPlayMode = 'ordered' | 'random';
+
 export interface IMusicQueueItem {
   url: string;
   name: string;
@@ -14,6 +16,18 @@ interface IJukeboxState {
   folderPath: string;
   history: string[];
   totalFiles: number;
+  mode: JukeboxPlayMode;
+}
+
+export function shuffleArray<T>(items: T[]): T[] {
+  const result = [...items];
+  for (let i = result.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    const current = result[i]!;
+    result[i] = result[j]!;
+    result[j] = current;
+  }
+  return result;
 }
 
 export async function collectJukeboxAudioFiles(folderPath: string): Promise<string[]> {
@@ -66,6 +80,26 @@ export class MusicModule {
     logger.info('Audio', 'MusicModule inicializado (playfile + jukebox).');
   }
 
+  async getNextMusicInQueue(guildId: string): Promise<IMusicQueueItem | undefined> {
+    const queue = this.queueMap.get(guildId);
+    return Promise.resolve(queue?.[0]);
+  }
+
+  private buildJukeboxBatch(files: string[], state: IJukeboxState): string[] {
+    const availableFiles = files.filter((file) => !state.history.includes(file));
+    let nextFiles = availableFiles.length > 0 ? availableFiles : [...files];
+
+    if (availableFiles.length === 0) {
+      state.history = [];
+    }
+
+    if (state.mode === 'random') {
+      nextFiles = shuffleArray(nextFiles);
+    }
+
+    return nextFiles;
+  }
+
   private async refillJukeboxQueue(guildId: string): Promise<void> {
     const state = this.jukeboxStateMap.get(guildId);
     if (!state) return;
@@ -76,18 +110,13 @@ export class MusicModule {
     }
 
     state.totalFiles = files.length;
-    const availableFiles = files.filter((file) => !state.history.includes(file));
-    const nextFiles = availableFiles.length > 0 ? availableFiles : files;
-
-    if (availableFiles.length === 0) {
-      state.history = [];
-    }
+    const nextFiles = this.buildJukeboxBatch(files, state);
 
     const queue = this.queueMap.get(guildId) ?? [];
     for (const file of nextFiles) {
       queue.push({
         url: file,
-        name: path.basename(file),
+        name: path.parse(file).name,
         type: 'jukebox',
       });
     }
@@ -164,7 +193,7 @@ export class MusicModule {
     }
 
     const items: IMusicQueueItem[] = [
-      { url: query, name: query.split('/').pop() ?? 'Arquivo', type: 'arbitrary' },
+      { url: query, name: path.parse(query).name || 'Arquivo', type: 'arbitrary' },
     ];
 
     const queue = this.queueMap.get(guildId) ?? [];
@@ -187,7 +216,8 @@ export class MusicModule {
   async playJukebox(
     params: IConnectionParams,
     member: GuildMember,
-    folderPath: string
+    folderPath: string,
+    mode: JukeboxPlayMode = 'random'
   ): Promise<{ added: number; message: string }> {
     const { guildId } = params;
     this.connectionParamsMap.set(guildId, params);
@@ -205,19 +235,19 @@ export class MusicModule {
 
     const state: IJukeboxState = {
       folderPath: resolvedFolderPath,
-      history: this.jukeboxStateMap.get(guildId)?.history ?? [],
+      history: [],
       totalFiles: files.length,
+      mode,
     };
     this.jukeboxStateMap.set(guildId, state);
 
     const queue = this.queueMap.get(guildId) ?? [];
-    const unplayedFiles = files.filter((file) => !state.history.includes(file));
-    const nextFiles = unplayedFiles.length > 0 ? unplayedFiles : files;
+    const nextFiles = this.buildJukeboxBatch(files, state);
 
     for (const file of nextFiles) {
       queue.push({
         url: file,
-        name: path.basename(file),
+        name: path.parse(file).name,
         type: 'jukebox',
       });
     }
@@ -229,9 +259,10 @@ export class MusicModule {
       await this.playNext(guildId, params);
     }
 
+    const modeLabel = mode === 'random' ? 'aleatório' : 'em ordem';
     return {
       added: nextFiles.length,
-      message: `${path.basename(resolvedFolderPath)} (${nextFiles.length} arquivos adicionados, sem repetir até percorrer tudo)`,
+      message: `${path.basename(resolvedFolderPath)} (${nextFiles.length} arquivos, modo ${modeLabel}, sem repetir até percorrer tudo)`,
     };
   }
 

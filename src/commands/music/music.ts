@@ -59,6 +59,16 @@ export const musicCommand: ICommand = {
             .setRequired(true)
             .setAutocomplete(true)
         )
+        .addStringOption((opt) =>
+          opt
+            .setName('mode')
+            .setDescription('Ordem de reprodução das músicas')
+            .setRequired(false)
+            .addChoices(
+              { name: 'Aleatório', value: 'random' },
+              { name: 'Em ordem', value: 'ordered' }
+            )
+        )
     ) as ICommand['data'],
 
   category: 'music',
@@ -127,8 +137,10 @@ export const musicCommand: ICommand = {
 
         case 'next': {
           client.musicModule.skip(guild.id);
+          const nextMusic = await client.musicModule.getNextMusicInQueue(guild.id);
+
           await interaction.reply({
-            content: 'Pulando para a próxima música...',
+            content: `Pulando para a próxima música. Irá tocar: ▶️ ${nextMusic?.name || 'Nenhuma'}`,
             flags: [MessageFlags.Ephemeral],
           });
           return;
@@ -185,6 +197,8 @@ export const musicCommand: ICommand = {
         }
         case 'jukebox': {
           const category = interaction.options.getString('category', true);
+          const modeOption = interaction.options.getString('mode');
+          const mode = modeOption === 'ordered' ? 'ordered' : 'random';
           const folder = path.join(client.settings.jukeboxRoot, category);
 
           const mem = await resolveMember(member, guild, interaction.user.id);
@@ -192,7 +206,12 @@ export const musicCommand: ICommand = {
 
           await interaction.deferReply({ flags: [MessageFlags.Ephemeral] });
 
-          const { message } = await client.musicModule.playJukebox(connectionParams, mem, folder);
+          const { message } = await client.musicModule.playJukebox(
+            connectionParams,
+            mem,
+            folder,
+            mode
+          );
           await interaction.editReply({ content: `▶️ ${message}` });
           return;
         }
