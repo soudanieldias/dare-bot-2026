@@ -10,10 +10,9 @@ import {
   TextInputBuilder,
   TextInputStyle,
 } from 'discord.js';
-import type { ITicketCategory } from '@/interfaces/ITicketCategory.js';
-import type { IPendingConfig } from '@/types/ticket.js';
-import type { GuildRepository } from '@/database/repositories/GuildRepository.js';
-import type { GuildSettingsRepository } from '@/database/repositories/GuildSettingsRepository.js';
+import type { GuildRepository, GuildSettingsRepository } from '@/database/index.js';
+import type { ITicketCategory } from '@/interfaces/index.js';
+import type { IPendingConfig } from '@/types/index.js';
 import {
   DEFAULT_TICKET_CATEGORIES,
   TICKET_CUSTOM_IDS,
@@ -22,7 +21,7 @@ import {
   getTicketCategoriesForGuild,
   normalizeCategoryId,
   validateCategoryPayload,
-} from '@/utils/ticketHelpers.js';
+} from './ticketHelpers.js';
 
 export interface ITicketConfigDeps {
   guildRepo: GuildRepository;

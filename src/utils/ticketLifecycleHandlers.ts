@@ -10,13 +10,9 @@ import {
   StringSelectMenuInteraction,
 } from 'discord.js';
 import discordTranscripts from 'discord-html-transcripts';
-import type { GuildSettingsRepository } from '@/database/repositories/GuildSettingsRepository.js';
-import type { TicketRepository } from '@/database/repositories/TicketRepository.js';
-import { logger } from '@/shared/Logger.js';
-import {
-  TICKET_CUSTOM_IDS,
-  getTicketCategoriesForGuild,
-} from '@/utils/ticketHelpers.js';
+import type { GuildSettingsRepository, TicketRepository } from '@/database/index.js';
+import { logger } from '@/shared/index.js';
+import { TICKET_CUSTOM_IDS, getTicketCategoriesForGuild } from './ticketHelpers.js';
 
 export interface ITicketLifecycleDeps {
   settingsRepo: GuildSettingsRepository;
@@ -397,9 +393,8 @@ export async function processTicketTranscript(
     flags: MessageFlags.Ephemeral,
   });
 
-  let transcriptAttachment: Awaited<
-    ReturnType<typeof discordTranscripts.createTranscript>
-  > | null = null;
+  let transcriptAttachment: Awaited<ReturnType<typeof discordTranscripts.createTranscript>> | null =
+    null;
   try {
     transcriptAttachment = await discordTranscripts.createTranscript(channel as never, {
       limit: -1,

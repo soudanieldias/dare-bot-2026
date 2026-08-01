@@ -1,5 +1,4 @@
-import { AppDataSource } from '@/database/DatabaseSource.js';
-import { GuildRepository } from '@/database/repositories/GuildRepository.js';
+import { AppDataSource, GuildRepository } from '@/database/index.js';
 import { type IDareClient } from '@/interfaces/index.js';
 import { logger } from '@/shared/index.js';
 

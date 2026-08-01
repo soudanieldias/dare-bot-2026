@@ -1,5 +1,5 @@
 import { createRequire } from 'node:module';
-import type { IDareClient } from '@/interfaces/IDareClient.js';
+import type { IDareClient } from '@/interfaces/index.js';
 
 const require = createRequire(import.meta.url);
 const discordTTS = require('discord-tts');

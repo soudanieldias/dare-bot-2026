@@ -1,4 +1,4 @@
-import type { IDareClient } from '@/interfaces/IDareClient.js';
+import type { IDareClient } from '@/interfaces/index.js';
 import type { AutocompleteInteraction } from 'discord.js';
 import { JUKEBOX_ROOT } from './MusicModule.js';
 import { readdir } from 'node:fs/promises';

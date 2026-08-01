@@ -1,4 +1,4 @@
-import type { IDareClient } from '@/interfaces/IDareClient.js';
+import type { IDareClient } from '@/interfaces/index.js';
 
 export class SettingsModule {
   public jukeboxRoot: string = './src/jukebox';

@@ -1,8 +1,7 @@
 import { readdir } from 'node:fs/promises';
 import path from 'node:path';
 import type { GuildMember } from 'discord.js';
-import type { IDareClient } from '@/interfaces/IDareClient.js';
-import type { IConnectionParams } from '@/interfaces/IAudio.js';
+import type { IConnectionParams, IDareClient } from '@/interfaces/index.js';
 import { logger } from '@/shared/index.js';
 
 export const JUKEBOX_ROOT = path.resolve('src/jukebox');

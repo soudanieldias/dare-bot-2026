@@ -1,6 +1,5 @@
 import { Repository } from 'typeorm';
-import { AppDataSource } from '@/database/DatabaseSource.js';
-import { GuildSettings } from '@/database/entities/index.js';
+import { AppDataSource, GuildSettings } from '@/database/index.js';
 
 export class GuildSettingsRepository {
   private repo: Repository<GuildSettings>;

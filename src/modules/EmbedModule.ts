@@ -1,4 +1,4 @@
-import type { IDareClient } from '@/interfaces/IDareClient.js';
+import type { IDareClient } from '@/interfaces/index.js';
 import { EmbedBuilder } from 'discord.js';
 import type { Interaction } from 'discord.js';
 

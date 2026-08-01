@@ -4,9 +4,8 @@ import {
   MessageFlags,
   type Interaction,
 } from 'discord.js';
-import { getI18n, replaceParams } from '@/utils/index.js';
-import { sendEmbed, SystemResourceHelper } from '@/utils/index.js';
-import type { IDareClient } from '@/interfaces/IDareClient.js';
+import type { IDareClient } from '@/interfaces/index.js';
+import { getI18n, replaceParams, sendEmbed, SystemResourceHelper } from '@/utils/index.js';
 import { Stats } from 'node:fs';
 
 export default {

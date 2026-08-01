@@ -4,39 +4,37 @@ import type {
   ModalSubmitInteraction,
   StringSelectMenuInteraction,
 } from 'discord.js';
+import {
+  GuildRepository,
+  GuildSettingsRepository,
+  TicketRepository,
+} from '@/database/index.js';
 import type { IDareClient, ITicketCategory } from '@/interfaces/index.js';
-import { GuildRepository } from '@/database/repositories/GuildRepository.js';
-import { GuildSettingsRepository } from '@/database/repositories/GuildSettingsRepository.js';
-import { TicketRepository } from '@/database/repositories/TicketRepository.js';
-import { logger } from '@/shared/Logger.js';
-import type { IPendingConfig } from '@/types/ticket.js';
+import { logger } from '@/shared/index.js';
+import type { IPendingConfig } from '@/types/index.js';
 import {
   DEFAULT_TICKET_CATEGORIES,
   TICKET_CUSTOM_IDS,
-  isTicketInteraction,
-} from '@/utils/ticketHelpers.js';
-import {
   handleAddCategoryCommand,
   handleConfigCommand,
   handleEditCategoryCommand,
   handleRemoveCategoryCommand,
+  isTicketInteraction,
   processAddCategoryModal,
+  processCategorySelect,
   processConfigModal,
   processEditCategoryModal,
   processEditCategorySelect,
   processRemoveCategorySelect,
-  type ITicketConfigDeps,
-} from '@/utils/ticketConfigHandlers.js';
-import {
-  processCategorySelect,
   processTicketClaim,
   processTicketClose,
   processTicketCloseMessage,
   processTicketMention,
   processTicketReopen,
   processTicketTranscript,
+  type ITicketConfigDeps,
   type ITicketLifecycleDeps,
-} from '@/utils/ticketLifecycleHandlers.js';
+} from '@/utils/index.js';
 
 export class TicketModule {
   private guildRepo = new GuildRepository();

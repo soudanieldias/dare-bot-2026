@@ -1,4 +1,4 @@
-import type { ITicketCategory } from '@/interfaces/ITicketCategory.js';
+import type { ITicketCategory } from '@/interfaces/index.js';
 
 export type TicketInteractionType = 'selectMenu' | 'singleButton' | 'openDirect' | 'modal';
 

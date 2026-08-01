@@ -4,9 +4,8 @@ import {
   MessageFlags,
   type Interaction,
 } from 'discord.js';
-import type { IDareClient } from '@/interfaces/IDareClient.js';
-import type { ICommand } from '@/interfaces/ICommand.js';
-import { TtsModule } from '@/modules/TtsModule.js';
+import type { ICommand, IDareClient } from '@/interfaces/index.js';
+import { TtsModule } from '@/modules/index.js';
 
 const TTS_LANGUAGES = 'pt-BR, pt-PT, en-US, es-ES, fr-FR, de-DE, it-IT, ja-JP';
 

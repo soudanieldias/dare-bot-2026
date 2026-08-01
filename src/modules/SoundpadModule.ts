@@ -1,15 +1,18 @@
 import { readdirSync } from 'fs';
 import { join, extname, relative } from 'path';
-import { Events, MessageFlags, ActionRowBuilder, ButtonBuilder, ButtonStyle } from 'discord.js';
-import type { IDareClient } from '@/interfaces/IDareClient.js';
-import type { IConnectionParams, IPadInfo } from '@/interfaces/IAudio.js';
-import { GuildMember } from 'discord.js';
-import type {
-  StringSelectMenuInteraction,
-  ButtonInteraction,
-  TextChannel,
-  VoiceChannel,
+import {
+  ActionRowBuilder,
+  ButtonBuilder,
+  ButtonStyle,
+  Events,
+  GuildMember,
+  MessageFlags,
+  type ButtonInteraction,
+  type StringSelectMenuInteraction,
+  type TextChannel,
+  type VoiceChannel,
 } from 'discord.js';
+import type { IConnectionParams, IDareClient, IPadInfo } from '@/interfaces/index.js';
 import { logger } from '@/shared/index.js';
 
 export const SOUNDPAD_CATEGORIES: Array<{ label: string; value: string }> = [

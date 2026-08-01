@@ -1,6 +1,7 @@
 import * as readline from 'readline';
 import { getDiscordClient } from './Client.js';
-import type { IDareClient } from './interfaces/index.js';
+import { AppDataSource } from '@/database/index.js';
+import type { IDareClient } from '@/interfaces/index.js';
 import {
   ActivityModule,
   AudioManagerModule,
@@ -14,9 +15,8 @@ import {
   SettingsModule,
   SoundpadModule,
   TicketModule,
-} from './modules/index.js';
-import { config, logger } from './shared/index.js';
-import { AppDataSource } from './database/DatabaseSource.js';
+} from '@/modules/index.js';
+import { config, logger } from '@/shared/index.js';
 
 export class App {
   private client: IDareClient = getDiscordClient();

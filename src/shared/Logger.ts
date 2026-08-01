@@ -1,6 +1,6 @@
 import colors from 'colors';
 import { type Client, EmbedBuilder } from 'discord.js';
-import { config } from '@/shared/Config.js';
+import { config } from './Config.js';
 
 export class Logger {
   private readonly isDebug = config.discord.debug ?? false;

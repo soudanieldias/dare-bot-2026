@@ -9,7 +9,7 @@ import {
   VoiceConnection,
   VoiceConnectionStatus,
 } from '@discordjs/voice';
-import { type IDareClient } from '@/interfaces/IDareClient.js';
+import { type IDareClient } from '@/interfaces/index.js';
 import { logger } from '@/shared/index.js';
 
 interface AudioQueueItem {

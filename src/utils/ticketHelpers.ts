@@ -1,10 +1,10 @@
 import { StringSelectMenuBuilder } from 'discord.js';
-import type { ITicketCategory } from '@/interfaces/ITicketCategory.js';
+import type { ITicketCategory } from '@/interfaces/index.js';
 import type {
   TicketInteractionType,
   ICategoryPayload,
   ICategoryValidationResult,
-} from '@/types/ticket.js';
+} from '@/types/index.js';
 
 export const TICKET_PREFIX_UNDERSCORE = 'ticket_';
 export const TICKET_PREFIX_HYPHEN = 'ticket-';

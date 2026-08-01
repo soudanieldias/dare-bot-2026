@@ -1,6 +1,5 @@
 import { Repository } from 'typeorm';
-import { AppDataSource } from '@/database/DatabaseSource.js';
-import { Ticket } from '@/database/entities/index.js';
+import { AppDataSource, Ticket } from '@/database/index.js';
 
 export class TicketRepository {
   private repo: Repository<Ticket>;

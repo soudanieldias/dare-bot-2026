@@ -4,8 +4,7 @@ import {
   MessageFlags,
   type Interaction,
 } from 'discord.js';
-import type { IDareClient } from '@/interfaces/IDareClient.js';
-import type { ICommand } from '@/interfaces/ICommand.js';
+import type { ICommand, IDareClient } from '@/interfaces/index.js';
 
 export const ticketCommand: ICommand = {
   data: new SlashCommandBuilder()
