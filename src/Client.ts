@@ -1,26 +1,41 @@
 import { Client, Collection, GatewayIntentBits, Partials } from 'discord.js';
 import type { IDareClient } from './interfaces/index.js';
 
-const partials: [] | Array<Partials> = [
+const partials: Partials[] = [
+  Partials.User,
   Partials.Channel,
-  Partials.Message,
   Partials.GuildMember,
+  Partials.Message,
+  Partials.Reaction,
   Partials.GuildScheduledEvent,
+  Partials.ThreadMember,
+  Partials.SoundboardSound,
   Partials.Poll,
   Partials.PollAnswer,
-  Partials.Reaction,
-  Partials.SoundboardSound,
-  Partials.ThreadMember,
-  Partials.User,
 ];
 
-const intents: [] | Array<GatewayIntentBits> = [
+const intents: GatewayIntentBits[] = [
   GatewayIntentBits.Guilds,
-  GatewayIntentBits.GuildMessages,
-  GatewayIntentBits.MessageContent,
   GatewayIntentBits.GuildMembers,
+  GatewayIntentBits.GuildModeration,
+  GatewayIntentBits.GuildExpressions,
+  GatewayIntentBits.GuildIntegrations,
+  GatewayIntentBits.GuildWebhooks,
+  GatewayIntentBits.GuildInvites,
   GatewayIntentBits.GuildVoiceStates,
+  GatewayIntentBits.GuildPresences,
+  GatewayIntentBits.GuildMessages,
+  GatewayIntentBits.GuildMessageReactions,
+  GatewayIntentBits.GuildMessageTyping,
   GatewayIntentBits.DirectMessages,
+  GatewayIntentBits.DirectMessageReactions,
+  GatewayIntentBits.DirectMessageTyping,
+  GatewayIntentBits.MessageContent,
+  GatewayIntentBits.GuildScheduledEvents,
+  GatewayIntentBits.AutoModerationConfiguration,
+  GatewayIntentBits.AutoModerationExecution,
+  GatewayIntentBits.GuildMessagePolls,
+  GatewayIntentBits.DirectMessagePolls,
 ];
 
 let instance: IDareClient | null = null;

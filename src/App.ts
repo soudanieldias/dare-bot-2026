@@ -27,9 +27,8 @@ export class App {
   }
 
   public async bootstrap(): Promise<void> {
-    logger.info('App', 'Starting Dare Bot 2026...');
     try {
-      await new DatabaseModule().bootstrap();
+      logger.info('App', 'Starting Dare Bot 2026...');
 
       await this.initializeModules();
 
@@ -80,6 +79,7 @@ export class App {
   }
 
   private async initializeModules(): Promise<void> {
+    await new DatabaseModule().bootstrap();
     await new OnClientReadyModule(this.client).bootstrap();
     await new ActivityModule(this.client).bootstrap();
     await new OnInteractionModule(this.client).bootstrap();
@@ -89,7 +89,7 @@ export class App {
     await new SettingsModule(this.client).bootstrap();
     await new AutocompleteModule(this.client).bootstrap();
 
-    // Initialize Audio System (core) + Music + Soundpad
+    // Initialize Audio System (core) + Music + Soundpad + Jukebox
     await new AudioManagerModule(this.client).bootstrap();
     await new MusicModule(this.client).bootstrap();
     await new SoundpadModule(this.client).bootstrap();
