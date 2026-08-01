@@ -10,5 +10,5 @@ export * from './OnInteractionModule.js';
 export * from './OnMessageCreateModule.js';
 export * from './SettingsModule.js';
 export * from './SoundpadModule.js';
-export { TicketModule } from './ticket/index.js';
+export * from './TicketModule.js';
 export * from './TtsModule.js';

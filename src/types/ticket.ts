@@ -25,3 +25,11 @@ export interface ICategoryValidationResult {
   error?: string;
   payload?: ICategoryPayload;
 }
+
+export interface IPendingConfig {
+  channelId: string;
+  logsId: string;
+  categoryId: string;
+  roleId: string;
+  mentionId: string | null;
+}

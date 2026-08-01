@@ -6,8 +6,6 @@ dist/
 sandbox/
 releases/
 
-src/audios/**/*.mp3
-src/audios/**/*.wav
-
-src/jukebox/**/*.mp3
-src/jukebox/**/*.wav
+*.mp3
+*.ogg
+*.wav
