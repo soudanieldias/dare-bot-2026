@@ -22,7 +22,7 @@ export class OnInteractionModule {
 
         // Autocomplete Handler
         if (interaction.isAutocomplete()) {
-          await this.client.autocompleteModule?.execute(interaction);
+          await this.client.autocompleteModule.execute(interaction);
           return;
         }
 

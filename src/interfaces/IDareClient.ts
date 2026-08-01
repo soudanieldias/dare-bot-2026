@@ -19,6 +19,6 @@ export interface IDareClient extends Client {
   musicModule: MusicModule;
   settings: SettingsModule;
   soundpadModule: SoundpadModule;
-  ticketModule?: TicketModule;
+  ticketModule: TicketModule;
   ttsModule: TtsModule;
 }
