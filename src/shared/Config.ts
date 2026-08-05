@@ -7,7 +7,7 @@ export const config = {
     devId: process.env.DEV_ID ?? '',
     debug: process.env.DEBUG === 'true',
     prefix: process.env.BOT_PREFIX ?? '//',
-    activityText: process.env.DEFAULT_ACTIVITY_TEXT ?? 'Dare Bot 2026',
+    activityText: process.env.DEFAULT_ACTIVITY_TEXT ?? 'Dare Bot 2026 v2',
     activityType: process.env.DEFAULT_ACTIVITY_TYPE ?? 'PLAYING',
   },
   database: {
