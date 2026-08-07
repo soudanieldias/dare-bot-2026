@@ -1,7 +1,6 @@
 import {
   ActionRowBuilder,
   ChatInputCommandInteraction,
-  EmbedBuilder,
   MessageFlags,
   ModalBuilder,
   ModalSubmitInteraction,
@@ -11,11 +10,11 @@ import {
   TextInputStyle,
 } from 'discord.js';
 import type { GuildRepository, GuildSettingsRepository } from '@/database/index.js';
-import { DEFAULT_TICKET_CATEGORIES, TICKET_CUSTOM_IDS } from '@/constants/index.js';
+import { DEFAULT_TICKET_CATEGORIES, DEFAULT_TICKET_WELCOME, TICKET_CUSTOM_IDS } from '@/constants/index.js';
 import type { ITicketCategory } from '@/interfaces/index.js';
 import type { IPendingConfig } from '@/types/index.js';
 import {
-  buildSelectMenuFromCategories,
+  buildTicketPanel,
   ensureGuildExists,
   getTicketCategoriesForGuild,
   normalizeCategoryId,
@@ -70,34 +69,18 @@ export async function handleConfigCommand(
   modal.addComponents(
     new ActionRowBuilder<TextInputBuilder>().addComponents(
       new TextInputBuilder()
-        .setCustomId('opentitle')
-        .setLabel('Título da mensagem de abertura')
+        .setCustomId('paneltitle')
+        .setLabel('Título do painel de tickets')
         .setStyle(TextInputStyle.Short)
         .setPlaceholder('Ex: Sistema de Tickets')
         .setRequired(true)
     ),
     new ActionRowBuilder<TextInputBuilder>().addComponents(
       new TextInputBuilder()
-        .setCustomId('opendescription')
-        .setLabel('Descrição da mensagem de abertura')
+        .setCustomId('paneldescription')
+        .setLabel('Descrição do painel de tickets')
         .setStyle(TextInputStyle.Paragraph)
-        .setPlaceholder('Clique no menu para abrir um ticket')
-        .setRequired(true)
-    ),
-    new ActionRowBuilder<TextInputBuilder>().addComponents(
-      new TextInputBuilder()
-        .setCustomId('tickettitle')
-        .setLabel('Título do embed do ticket')
-        .setStyle(TextInputStyle.Short)
-        .setPlaceholder('Ex: Bem-vindo ao seu ticket')
-        .setRequired(true)
-    ),
-    new ActionRowBuilder<TextInputBuilder>().addComponents(
-      new TextInputBuilder()
-        .setCustomId('ticketdescription')
-        .setLabel('Descrição do embed do ticket')
-        .setStyle(TextInputStyle.Paragraph)
-        .setPlaceholder('Como posso ajudá-lo?')
+        .setPlaceholder('Selecione uma categoria abaixo para abrir um ticket')
         .setRequired(true)
     )
   );
@@ -123,10 +106,8 @@ export async function processConfigModal(
 
   await ensureGuildExists(deps.guildRepo, interaction.guildId!, interaction.guild);
 
-  const openTitle = interaction.fields.getTextInputValue('opentitle');
-  const openDescription = interaction.fields.getTextInputValue('opendescription');
-  const ticketTitle = interaction.fields.getTextInputValue('tickettitle');
-  const ticketDescription = interaction.fields.getTextInputValue('ticketdescription');
+  const ticketTitle = interaction.fields.getTextInputValue('paneltitle');
+  const ticketPanelDescription = interaction.fields.getTextInputValue('paneldescription');
 
   await deps.settingsRepo.upsert(interaction.guildId!, {
     ticketChannelId: pending.channelId,
@@ -135,42 +116,20 @@ export async function processConfigModal(
     ticketRoleId: pending.roleId,
     mentionRoleId: pending.mentionId,
     ticketTitle,
-    ticketDescription,
+    ticketPanelDescription,
+    ticketDescription: DEFAULT_TICKET_WELCOME,
   });
 
   const categories = getTicketCategoriesForGuild(
     (await deps.settingsRepo.findByGuildId(interaction.guildId!))?.ticketCategoriesJson
   );
 
-  const categoriesText = categories
-    .map((c) => `${c.emoji} **${c.name}** - ${c.description ?? ''}`)
-    .join('\n')
-    .slice(0, 1024);
-
-  const icon = interaction.guild.iconURL();
-  const embed = new EmbedBuilder()
-    .setColor(0x2f3136)
-    .setAuthor({
-      name: openTitle,
-      ...(icon ? { iconURL: icon } : {}),
-    })
-    .setDescription(openDescription)
-    .addFields({
-      name: '🎫 Categorias',
-      value: categoriesText || 'Nenhuma categoria configurada.',
-      inline: false,
-    })
-    .setFooter({
-      text: interaction.guild.name,
-      ...(icon ? { iconURL: icon } : {}),
-    });
-
-  const menu = buildSelectMenuFromCategories(
+  const { embed, row } = buildTicketPanel(
+    interaction.guild,
     categories,
-    TICKET_CUSTOM_IDS.categorySelect,
-    'Selecione o tipo de ticket'
+    ticketTitle,
+    ticketPanelDescription
   );
-  const row = new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(menu);
 
   try {
     const ch = await interaction.guild.channels.fetch(pending.channelId);

@@ -13,7 +13,7 @@ import discordTranscripts from 'discord-html-transcripts';
 import type { GuildSettingsRepository, TicketRepository } from '@/database/index.js';
 import { TICKET_CUSTOM_IDS } from '@/constants/index.js';
 import { logger } from '@/shared/index.js';
-import { getTicketCategoriesForGuild } from './ticketHelpers.js';
+import { getTicketCategoriesForGuild, getTicketWelcomeMessage } from './ticketHelpers.js';
 
 export interface ITicketLifecycleDeps {
   settingsRepo: GuildSettingsRepository;
@@ -97,7 +97,7 @@ export async function processCategorySelect(
       name: `${category.emoji} Ticket #${ticketNumber.toString().padStart(4, '0')}`,
       ...(gIcon ? { iconURL: gIcon } : {}),
     })
-    .setDescription(category.description ?? `Bem-vindo ao seu ticket de ${category.name}!`)
+    .setDescription(getTicketWelcomeMessage(settings.ticketDescription))
     .addFields(
       { name: '👤 Usuário', value: `<@${interaction.user.id}>`, inline: true },
       { name: '🎫 Número', value: `#${ticketNumber}`, inline: true }

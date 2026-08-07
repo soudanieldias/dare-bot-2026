@@ -4,12 +4,15 @@ import type {
   ModalSubmitInteraction,
   StringSelectMenuInteraction,
 } from 'discord.js';
+import { MessageFlags } from 'discord.js';
 import { DEFAULT_TICKET_CATEGORIES, TICKET_CUSTOM_IDS } from '@/constants/index.js';
 import { GuildRepository, GuildSettingsRepository, TicketRepository } from '@/database/index.js';
 import type { IDareClient, ITicketCategory } from '@/interfaces/index.js';
 import { logger } from '@/shared/index.js';
 import type { IPendingConfig } from '@/types/index.js';
 import {
+  buildTicketPanel,
+  getTicketCategoriesForGuild,
   handleAddCategoryCommand,
   handleConfigCommand,
   handleEditCategoryCommand,
@@ -131,5 +134,67 @@ export class TicketModule {
 
   async handleEditCategoryCommand(interaction: ChatInputCommandInteraction): Promise<void> {
     return handleEditCategoryCommand(this.configDeps, interaction);
+  }
+
+  async handleSendEmbedCommand(interaction: ChatInputCommandInteraction): Promise<void> {
+    const guildId = interaction.guildId;
+    if (!guildId || !interaction.guild) {
+      await interaction.reply({
+        content: 'Este comando só pode ser usado em servidores.',
+        flags: MessageFlags.Ephemeral,
+      });
+      return;
+    }
+
+    try {
+      const settings = await this.settingsRepo.findByGuildId(guildId);
+      if (!settings?.ticketChannelId) {
+        await interaction.reply({
+          content:
+            'O canal de tickets não está configurado. Use `/ticket config` para configurá-lo.',
+          flags: MessageFlags.Ephemeral,
+        });
+        return;
+      }
+
+      const channel = await interaction.guild.channels.fetch(settings.ticketChannelId);
+      if (!channel || !channel.isTextBased() || channel.isDMBased()) {
+        await interaction.reply({
+          content: 'O canal de tickets configurado não é um canal de texto válido.',
+          flags: MessageFlags.Ephemeral,
+        });
+        return;
+      }
+
+      const categories = getTicketCategoriesForGuild(settings.ticketCategoriesJson);
+      const { embed, row } = buildTicketPanel(
+        interaction.guild,
+        categories,
+        settings.ticketTitle,
+        settings.ticketPanelDescription ?? settings.ticketDescription
+      );
+
+      await channel.send({
+        embeds: [embed],
+        components: [row],
+      });
+
+      await interaction.reply({
+        content: `✅ Painel de tickets enviado em <#${channel.id}>.`,
+        flags: MessageFlags.Ephemeral,
+      });
+    } catch (error) {
+      logger.error(
+        'TicketModule',
+        `Erro ao enviar embed: ${error instanceof Error ? error.message : String(error)}`
+      );
+
+      const content = '❌ Não foi possível enviar o painel de tickets.';
+      if (interaction.replied || interaction.deferred) {
+        await interaction.followUp({ content, flags: MessageFlags.Ephemeral }).catch(() => null);
+      } else {
+        await interaction.reply({ content, flags: MessageFlags.Ephemeral }).catch(() => null);
+      }
+    }
   }
 }

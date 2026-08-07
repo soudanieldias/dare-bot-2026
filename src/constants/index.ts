@@ -66,6 +66,17 @@ export const TICKET_CUSTOM_IDS = {
   closeMessage: 'ticket_close-message',
 } as const;
 
+/** Título padrão do painel de tickets */
+export const DEFAULT_TICKET_PANEL_TITLE = 'Sistema de Tickets';
+
+/** Descrição padrão do painel de tickets */
+export const DEFAULT_TICKET_PANEL_DESCRIPTION =
+  'Selecione uma categoria abaixo para abrir um ticket.';
+
+/** Mensagem padrão dentro do canal do ticket (não usa description da categoria) */
+export const DEFAULT_TICKET_WELCOME =
+  'Olá! Descreva seu problema com o máximo de detalhes. A equipe irá atendê-lo em breve.';
+
 export const DEFAULT_TICKET_CATEGORIES: ITicketCategory[] = [
   {
     id: 'suporte',

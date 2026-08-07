@@ -22,4 +22,8 @@ export const config = {
   logging: {
     webhookUrl: process.env.LOG_WEBHOOK_URL ?? '',
   },
+  bot: {
+    name: process.env.BOT_NAME ?? 'Dare Bot 2026',
+    version: process.env.BOT_VERSION ?? 'v2.0.0',
+  },
 } as const;

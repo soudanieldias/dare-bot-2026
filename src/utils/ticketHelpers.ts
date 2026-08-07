@@ -1,6 +1,15 @@
-import { StringSelectMenuBuilder } from 'discord.js';
+import {
+  ActionRowBuilder,
+  EmbedBuilder,
+  StringSelectMenuBuilder,
+  type Guild,
+} from 'discord.js';
 import {
   DEFAULT_TICKET_CATEGORIES,
+  DEFAULT_TICKET_PANEL_DESCRIPTION,
+  DEFAULT_TICKET_PANEL_TITLE,
+  DEFAULT_TICKET_WELCOME,
+  TICKET_CUSTOM_IDS,
   TICKET_PREFIX_HYPHEN,
   TICKET_PREFIX_UNDERSCORE,
 } from '@/constants/index.js';
@@ -74,6 +83,53 @@ export function buildSelectMenuFromCategories(
     });
   }
   return menu;
+}
+
+export function getTicketWelcomeMessage(ticketDescription?: string | null): string {
+  const text = ticketDescription?.trim();
+  return text || DEFAULT_TICKET_WELCOME;
+}
+
+export function buildTicketPanel(
+  guild: Guild,
+  categories: ITicketCategory[],
+  panelTitle?: string | null,
+  panelDescription?: string | null
+): {
+  embed: EmbedBuilder;
+  row: ActionRowBuilder<StringSelectMenuBuilder>;
+} {
+  const categoriesText = categories
+    .map((c) => `${c.emoji} **${c.name}** - ${c.description ?? ''}`)
+    .join('\n')
+    .slice(0, 1024);
+
+  const icon = guild.iconURL();
+  const embed = new EmbedBuilder()
+    .setColor(0x2f3136)
+    .setAuthor({
+      name: panelTitle?.trim() || DEFAULT_TICKET_PANEL_TITLE,
+      ...(icon ? { iconURL: icon } : {}),
+    })
+    .setDescription(panelDescription?.trim() || DEFAULT_TICKET_PANEL_DESCRIPTION)
+    .addFields({
+      name: '🎫 Categorias',
+      value: categoriesText || 'Nenhuma categoria configurada.',
+      inline: false,
+    })
+    .setFooter({
+      text: guild.name,
+      ...(icon ? { iconURL: icon } : {}),
+    });
+
+  const menu = buildSelectMenuFromCategories(
+    categories,
+    TICKET_CUSTOM_IDS.categorySelect,
+    'Selecione o tipo de ticket'
+  );
+  const row = new ActionRowBuilder<StringSelectMenuBuilder>().addComponents(menu);
+
+  return { embed, row };
 }
 
 export async function ensureGuildExists(

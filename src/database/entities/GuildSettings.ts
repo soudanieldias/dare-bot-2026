@@ -44,6 +44,8 @@ export class GuildSettings {
   @Column({ type: 'varchar', length: 255, nullable: true })
   ticketButtonName!: string | null;
   @Column({ type: 'text', nullable: true })
+  ticketPanelDescription!: string | null;
+  @Column({ type: 'text', nullable: true })
   ticketDescription!: string | null;
   @Column({ type: 'varchar', length: 255, nullable: true })
   announcesChannelId!: string | null;

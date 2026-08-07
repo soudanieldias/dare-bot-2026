@@ -8,6 +8,7 @@ export interface ITicketGuildConfig {
   ticketLogsChannelId?: string | null;
   ticketRoleId?: string | null;
   ticketTitle?: string | null;
+  ticketPanelDescription?: string | null;
   ticketDescription?: string | null;
   ticketInteractionType?: TicketInteractionType | null;
   ticketCategories?: ITicketCategory[];

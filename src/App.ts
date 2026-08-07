@@ -28,12 +28,12 @@ export class App {
 
   public async bootstrap(): Promise<void> {
     try {
-      logger.info('App', 'Starting Dare Bot 2026...');
+      logger.info('App', `Starting ${config.bot.name} ${config.bot.version}.`);
 
       await this.initializeModules();
 
       await this.client.login(config.discord.token);
-      logger.info('App', 'Dare Bot Initialized successfully.');
+      logger.info('App', `${config.bot.name} ${config.bot.version} initialized successfully.`);
     } catch (error) {
       await logger.critical(
         'App',
