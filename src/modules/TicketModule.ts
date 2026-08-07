@@ -3,6 +3,7 @@ import type {
   ChatInputCommandInteraction,
   ModalSubmitInteraction,
   StringSelectMenuInteraction,
+  TextChannel,
 } from 'discord.js';
 import { MessageFlags } from 'discord.js';
 import { DEFAULT_TICKET_CATEGORIES, TICKET_CUSTOM_IDS } from '@/constants/index.js';
@@ -171,7 +172,7 @@ export class TicketModule {
         interaction.guild,
         categories,
         settings.ticketTitle,
-        settings.ticketPanelDescription ?? settings.ticketDescription
+        settings.ticketPanelDescription
       );
 
       await channel.send({
@@ -194,6 +195,74 @@ export class TicketModule {
         await interaction.followUp({ content, flags: MessageFlags.Ephemeral }).catch(() => null);
       } else {
         await interaction.reply({ content, flags: MessageFlags.Ephemeral }).catch(() => null);
+      }
+    }
+  }
+
+  async handleTransferTicketCommand(interaction: ChatInputCommandInteraction): Promise<void> {
+    const { guild, guildId } = interaction;
+    try {
+      if (!guild || !guildId) {
+        await interaction.reply({
+          content: 'Este comando só pode ser usado em servidores.',
+          flags: MessageFlags.Ephemeral,
+        });
+        return;
+      }
+
+      const userToTransfer = interaction.options.getUser('username', true);
+      if (!userToTransfer) {
+        await interaction.reply({
+          content: 'Você deve mencionar um usuário para transferir o ticket.',
+          flags: MessageFlags.Ephemeral,
+        });
+        return;
+      }
+
+      const ticket = await this.ticketRepo.findByChannel(interaction.channelId);
+      if (!ticket) {
+        await interaction.reply({
+          content: 'Este canal não está associado a nenhum ticket.',
+          flags: MessageFlags.Ephemeral,
+        });
+        return;
+      }
+
+      if (ticket.userId === userToTransfer.id) {
+        await interaction.reply({
+          content: 'O ticket já pertence a este usuário.',
+          flags: MessageFlags.Ephemeral,
+        });
+        return;
+      }
+
+      await this.ticketRepo.updateChannel(ticket.id, interaction.channelId);
+      await this.ticketRepo.claim(ticket.id, userToTransfer.id);
+
+      await interaction.reply({
+        content: `✅ O atendimento do ticket foi transferido para <@${userToTransfer.id}>.`,
+        flags: MessageFlags.Ephemeral,
+      });
+
+      const transferMessage = `O atendimento deste ticket foi transferido para <@${userToTransfer.id}>.`;
+      await (interaction.channel as TextChannel)
+        .send({ content: transferMessage })
+        .catch(() => null);
+    } catch (error) {
+      logger.error(
+        'TicketModule',
+        `Erro ao transferir ticket: ${error instanceof Error ? error.message : String(error)}`
+      );
+
+      const message = '❌ Não foi possível transferir o ticket.';
+      if (interaction.replied || interaction.deferred) {
+        await interaction
+          .followUp({ content: message, flags: MessageFlags.Ephemeral })
+          .catch(() => null);
+      } else {
+        await interaction
+          .reply({ content: message, flags: MessageFlags.Ephemeral })
+          .catch(() => null);
       }
     }
   }

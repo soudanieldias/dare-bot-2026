@@ -97,7 +97,7 @@ export async function processCategorySelect(
       name: `${category.emoji} Ticket #${ticketNumber.toString().padStart(4, '0')}`,
       ...(gIcon ? { iconURL: gIcon } : {}),
     })
-    .setDescription(getTicketWelcomeMessage(settings.ticketDescription))
+    .setDescription(getTicketWelcomeMessage())
     .addFields(
       { name: '👤 Usuário', value: `<@${interaction.user.id}>`, inline: true },
       { name: '🎫 Número', value: `#${ticketNumber}`, inline: true }

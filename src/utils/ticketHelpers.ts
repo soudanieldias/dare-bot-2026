@@ -1,9 +1,4 @@
-import {
-  ActionRowBuilder,
-  EmbedBuilder,
-  StringSelectMenuBuilder,
-  type Guild,
-} from 'discord.js';
+import { ActionRowBuilder, EmbedBuilder, StringSelectMenuBuilder, type Guild } from 'discord.js';
 import {
   DEFAULT_TICKET_CATEGORIES,
   DEFAULT_TICKET_PANEL_DESCRIPTION,
@@ -85,9 +80,8 @@ export function buildSelectMenuFromCategories(
   return menu;
 }
 
-export function getTicketWelcomeMessage(ticketDescription?: string | null): string {
-  const text = ticketDescription?.trim();
-  return text || DEFAULT_TICKET_WELCOME;
+export function getTicketWelcomeMessage(): string {
+  return DEFAULT_TICKET_WELCOME;
 }
 
 export function buildTicketPanel(

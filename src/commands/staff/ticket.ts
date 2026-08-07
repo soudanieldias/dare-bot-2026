@@ -62,6 +62,17 @@ export const ticketCommand: ICommand = {
     )
     .addSubcommand((sc) =>
       sc.setName('sendembed').setDescription('Envia um Ticket Embed no canal atual')
+    )
+    .addSubcommand((sc) =>
+      sc
+        .setName('transfer')
+        .setDescription('Transfere o atendimento do ticket para o usuário mencionado')
+        .addUserOption((username) =>
+          username
+            .setName('username')
+            .setDescription('Usuário para quem deseja transferir o ticket')
+            .setRequired(true)
+        )
     ) as ICommand['data'],
 
   category: 'staff',
@@ -87,6 +98,9 @@ export const ticketCommand: ICommand = {
         return;
       case 'sendembed':
         await client.ticketModule.handleSendEmbedCommand(interaction);
+        return;
+      case 'transfer':
+        await client.ticketModule.handleTransferTicketCommand(interaction);
         return;
       default:
         await interaction.reply({

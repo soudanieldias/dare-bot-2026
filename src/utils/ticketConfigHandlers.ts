@@ -10,7 +10,7 @@ import {
   TextInputStyle,
 } from 'discord.js';
 import type { GuildRepository, GuildSettingsRepository } from '@/database/index.js';
-import { DEFAULT_TICKET_CATEGORIES, DEFAULT_TICKET_WELCOME, TICKET_CUSTOM_IDS } from '@/constants/index.js';
+import { DEFAULT_TICKET_CATEGORIES, TICKET_CUSTOM_IDS } from '@/constants/index.js';
 import type { ITicketCategory } from '@/interfaces/index.js';
 import type { IPendingConfig } from '@/types/index.js';
 import {
@@ -117,7 +117,6 @@ export async function processConfigModal(
     mentionRoleId: pending.mentionId,
     ticketTitle,
     ticketPanelDescription,
-    ticketDescription: DEFAULT_TICKET_WELCOME,
   });
 
   const categories = getTicketCategoriesForGuild(
