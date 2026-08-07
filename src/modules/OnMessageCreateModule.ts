@@ -11,7 +11,13 @@ export class OnMessageCreateModule {
   public bootstrap(): void {
     this.client.on(Events.MessageCreate, async (message: Message) => {
       try {
-        if (message.author.bot || !message.content.startsWith(config.discord.prefix)) return;
+        if (message.author.bot) return;
+
+        if (this.client.ticketModule) {
+          await this.client.ticketModule.handleMessageCreate(message);
+        }
+
+        if (!message.content.startsWith(config.discord.prefix)) return;
 
         // TODO: Implement command router and logic here
       } catch (error) {

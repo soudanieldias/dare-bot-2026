@@ -8,6 +8,8 @@ import {
   MessageFlags,
   PermissionFlagsBits,
   StringSelectMenuInteraction,
+  type Client,
+  type Message,
 } from 'discord.js';
 import discordTranscripts from 'discord-html-transcripts';
 import type { GuildSettingsRepository, TicketRepository } from '@/database/index.js';
@@ -117,12 +119,12 @@ export async function processCategorySelect(
     .setStyle(ButtonStyle.Danger)
     .setLabel('Fechar')
     .setEmoji('🔒');
-  const mentionBtn = new ButtonBuilder()
-    .setCustomId(TICKET_CUSTOM_IDS.mention)
-    .setStyle(ButtonStyle.Secondary)
-    .setLabel('Mencionar')
-    .setEmoji('👤');
-  const row = new ActionRowBuilder<ButtonBuilder>().addComponents(claimBtn, closeBtn, mentionBtn);
+  // const mentionBtn = new ButtonBuilder()
+  //   .setCustomId(TICKET_CUSTOM_IDS.mention)
+  //   .setStyle(ButtonStyle.Secondary)
+  //   .setLabel('Mencionar')
+  //   .setEmoji('👤');
+  const row = new ActionRowBuilder<ButtonBuilder>().addComponents(claimBtn, closeBtn);
 
   let mentionContent = '';
   if (settings.mentionRoleId) {
@@ -286,12 +288,7 @@ export async function processTicketClaim(
       .setCustomId(TICKET_CUSTOM_IDS.close)
       .setStyle(ButtonStyle.Danger)
       .setLabel('Fechar')
-      .setEmoji('🔒'),
-    new ButtonBuilder()
-      .setCustomId(TICKET_CUSTOM_IDS.mention)
-      .setStyle(ButtonStyle.Secondary)
-      .setLabel('Mencionar')
-      .setEmoji('👤')
+      .setEmoji('🔒')
   );
 
   if (interaction.message && 'edit' in interaction.message) {
@@ -438,13 +435,56 @@ export async function processTicketTranscript(
   return true;
 }
 
+export async function notifyTicketAuthorMention(params: {
+  client: Client;
+  guildId: string;
+  guildName: string;
+  channelId: string;
+  authorUserId: string;
+  mentionedByTag: string;
+}): Promise<boolean> {
+  const { client, guildId, guildName, channelId, authorUserId, mentionedByTag } = params;
+
+  try {
+    const user = await client.users.fetch(authorUserId);
+
+    const embed = new EmbedBuilder()
+      .setColor(0x0099ff)
+      .setTitle('Ticket Aberto')
+      .setDescription(
+        `Olá ${user.tag}, você foi mencionado no ticket em ${guildName} por ${mentionedByTag}.`
+      )
+      .addFields([{ name: 'Canal', value: `<#${channelId}>` }])
+      .setTimestamp();
+    const btn = new ButtonBuilder()
+      .setLabel('Ir para o ticket')
+      .setURL(`https://discord.com/channels/${guildId}/${channelId}`)
+      .setStyle(ButtonStyle.Link);
+    const row = new ActionRowBuilder<ButtonBuilder>().addComponents(btn);
+
+    await user.send({
+      content: 'Você foi mencionado no ticket:',
+      embeds: [embed],
+      components: [row],
+    });
+    return true;
+  } catch (err) {
+    logger.error(
+      'TicketMention',
+      `Falha ao notificar autor: ${err instanceof Error ? err.message : String(err)}`
+    );
+    return false;
+  }
+}
+
+/** Mantido para embeds antigos que ainda tenham o botão Mencionar */
 export async function processTicketMention(
   _deps: ITicketLifecycleDeps,
   interaction: ButtonInteraction
 ): Promise<boolean> {
   const channel = interaction.channel;
   const topic = channel && 'topic' in channel ? channel.topic : null;
-  if (!topic) {
+  if (!topic || !interaction.guildId || !interaction.guild) {
     await interaction.reply({
       content: '❌ Não foi possível identificar o usuário do ticket.',
       flags: MessageFlags.Ephemeral,
@@ -452,37 +492,56 @@ export async function processTicketMention(
     return true;
   }
 
-  try {
-    const member = await interaction.guild!.members.fetch(topic);
-    const embed = new EmbedBuilder()
-      .setColor(0x0099ff)
-      .setTitle('Ticket Aberto')
-      .setDescription(
-        `Olá ${member.user.tag}, você foi mencionado no ticket em ${interaction.guild!.name}.`
-      )
-      .addFields([{ name: 'Canal', value: channel ? `<#${channel.id}>` : '' }])
-      .setTimestamp();
-    const btn = new ButtonBuilder()
-      .setLabel('Ir para o ticket')
-      .setURL(`https://discord.com/channels/${interaction.guildId}/${channel?.id ?? ''}`)
-      .setStyle(ButtonStyle.Link);
-    const row = new ActionRowBuilder<ButtonBuilder>().addComponents(btn);
+  const ok = await notifyTicketAuthorMention({
+    client: interaction.client,
+    guildId: interaction.guildId,
+    guildName: interaction.guild.name,
+    channelId: channel?.id ?? interaction.channelId,
+    authorUserId: topic,
+    mentionedByTag: interaction.user.tag,
+  });
 
-    await member.send({
-      content: `Você foi mencionado no ticket:`,
-      embeds: [embed],
-      components: [row],
-    });
+  await interaction.reply({
+    content: ok ? '✅ Usuário notificado.' : '❌ Não foi possível enviar DM ao usuário.',
+    flags: MessageFlags.Ephemeral,
+  });
+  return true;
+}
 
-    await interaction.reply({
-      content: '✅ Usuário notificado.',
-      flags: MessageFlags.Ephemeral,
-    });
-  } catch {
-    await interaction.reply({
-      content: '❌ Não foi possível enviar DM ao usuário.',
-      flags: MessageFlags.Ephemeral,
-    });
+export async function handleTicketAuthorMentionMessage(
+  deps: ITicketLifecycleDeps,
+  message: Message
+): Promise<boolean> {
+  if (message.author.bot || !message.guild) return false;
+
+  const channel = message.channel;
+  if (!('parentId' in channel) || !channel.parentId) return false;
+
+  const settings = await deps.settingsRepo.findByGuildId(message.guild.id);
+  if (!settings?.ticketCategoryId || channel.parentId !== settings.ticketCategoryId) {
+    return false;
   }
+
+  const ticket = await deps.ticketRepo.findByChannel(message.channelId);
+  const authorId = ticket?.userId ?? ('topic' in channel && channel.topic ? channel.topic : null);
+  if (!authorId) return false;
+
+  const mentionedIds = new Set([
+    ...message.mentions.users.keys(),
+    ...[...message.content.matchAll(/<@!?(\d+)>/g)].map((m) => m[1]!).filter(Boolean),
+  ]);
+
+  if (!mentionedIds.has(authorId)) return false;
+
+  const ok = await notifyTicketAuthorMention({
+    client: message.client,
+    guildId: message.guild.id,
+    guildName: message.guild.name,
+    channelId: message.channelId,
+    authorUserId: authorId,
+    mentionedByTag: message.author.tag,
+  });
+
+  await message.react(ok ? '✅' : '❌').catch(() => null);
   return true;
 }

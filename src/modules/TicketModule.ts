@@ -4,6 +4,7 @@ import type {
   ModalSubmitInteraction,
   StringSelectMenuInteraction,
   TextChannel,
+  Message,
 } from 'discord.js';
 import { MessageFlags } from 'discord.js';
 import { DEFAULT_TICKET_CATEGORIES, TICKET_CUSTOM_IDS } from '@/constants/index.js';
@@ -18,6 +19,7 @@ import {
   handleConfigCommand,
   handleEditCategoryCommand,
   handleRemoveCategoryCommand,
+  handleTicketAuthorMentionMessage,
   isTicketInteraction,
   processAddCategoryModal,
   processCategorySelect,
@@ -65,6 +67,10 @@ export class TicketModule {
 
   getDefaultCategories(): ITicketCategory[] {
     return [...DEFAULT_TICKET_CATEGORIES];
+  }
+
+  async handleMessageCreate(message: Message): Promise<boolean> {
+    return handleTicketAuthorMentionMessage(this.lifecycleDeps, message);
   }
 
   async handleButton(interaction: ButtonInteraction): Promise<boolean> {
