@@ -60,7 +60,7 @@ export class TicketModule {
     };
   }
 
-  async bootstrap(): Promise<void> {
+  public async bootstrap(): Promise<void> {
     this.client.ticketModule = this;
     logger.info('TicketModule', 'Bootstrapping TicketModule.');
   }

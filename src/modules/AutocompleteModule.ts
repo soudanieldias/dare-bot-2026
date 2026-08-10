@@ -6,7 +6,7 @@ import { readdir } from 'node:fs/promises';
 export class AutocompleteModule {
   constructor(private readonly client: IDareClient) {}
 
-  bootstrap(): void {
+  public async bootstrap(): Promise<void> {
     this.client.autocompleteModule = this;
   }
 

@@ -12,11 +12,7 @@ import {
   type TextChannel,
   type VoiceChannel,
 } from 'discord.js';
-import {
-  AUDIOS_DIR,
-  SOUNDPAD_BUTTONS_PER_ROW,
-  SOUNDPAD_PATHS,
-} from '@/constants/index.js';
+import { AUDIOS_DIR, SOUNDPAD_BUTTONS_PER_ROW, SOUNDPAD_PATHS } from '@/constants/index.js';
 import type { IConnectionParams, IDareClient, IPadInfo } from '@/interfaces/index.js';
 import { logger } from '@/shared/index.js';
 
@@ -75,7 +71,7 @@ export function generateSoundpadButtons(basePath: string): ActionRowBuilder<Butt
 export class SoundpadModule {
   constructor(private readonly client: IDareClient) {}
 
-  bootstrap(): void {
+  public async bootstrap(): Promise<void> {
     this.client.soundpadModule = this;
     this.client.once(Events.ClientReady, () => {
       this.loadPads(this.client);

@@ -5,7 +5,7 @@ export class SettingsModule {
   public jukeboxRoot: string = JUKEBOX_DIR;
   constructor(private readonly client: IDareClient) {}
 
-  bootstrap(): void {
+  public async bootstrap(): Promise<void> {
     this.client.settings = this;
   }
 }

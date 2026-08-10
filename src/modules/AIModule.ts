@@ -4,7 +4,7 @@ import { config, logger } from '@/shared/index.js';
 export class AiModule {
   constructor(private readonly client: IDareClient) {}
 
-  bootstrap(): void {
+  public async bootstrap(): Promise<void> {
     logger.info('AiModule', 'AI Module initialized.');
   }
 }

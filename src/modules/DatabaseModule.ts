@@ -3,7 +3,9 @@ import { type IDareClient } from '@/interfaces/index.js';
 import { logger } from '@/shared/index.js';
 
 export class DatabaseModule {
-  async bootstrap(): Promise<void> {
+  constructor(private readonly client: IDareClient) {}
+
+  public async bootstrap(): Promise<void> {
     try {
       await AppDataSource.initialize();
       logger.info('Database', 'Connection established.');

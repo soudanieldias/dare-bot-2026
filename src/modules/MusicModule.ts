@@ -73,7 +73,7 @@ export class MusicModule {
     this.client.musicModule = this;
   }
 
-  bootstrap(): void {
+  public async bootstrap(): Promise<void> {
     this.client.audioManager.setMusicOnIdleCallback((guildId) => {
       void this.playNext(guildId);
     });

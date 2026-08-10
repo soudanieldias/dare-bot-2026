@@ -79,7 +79,7 @@ export class App {
   }
 
   private async initializeModules(): Promise<void> {
-    await new DatabaseModule().bootstrap();
+    await new DatabaseModule(this.client).bootstrap();
     await new OnClientReadyModule(this.client).bootstrap();
     await new ActivityModule(this.client).bootstrap();
     await new OnInteractionModule(this.client).bootstrap();

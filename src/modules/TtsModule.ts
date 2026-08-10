@@ -19,7 +19,7 @@ export interface TtsConnectionParams {
 export class TtsModule {
   constructor(private readonly client: IDareClient) {}
 
-  bootstrap(): void {
+  public async bootstrap(): Promise<void> {
     this.client.ttsModule = this;
   }
 

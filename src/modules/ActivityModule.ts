@@ -5,7 +5,7 @@ import type { IDareClient } from '@/interfaces/index.js';
 export class ActivityModule {
   constructor(private readonly client: IDareClient) {}
 
-  bootstrap(): void {
+  public async bootstrap(): Promise<void> {
     this.client.once('clientReady', () => {
       logger.info('Activity', 'Inicializando Activity do BOT.');
       this.client.user?.setActivity({

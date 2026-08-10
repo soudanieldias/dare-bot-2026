@@ -7,7 +7,7 @@ import { getI18n } from '@/utils/index.js';
 export class OnInteractionModule {
   constructor(private readonly client: IDareClient) {}
 
-  public bootstrap(): void {
+  public async bootstrap(): Promise<void> {
     this.client.on(Events.InteractionCreate, async (interaction: Interaction) => {
       try {
         // ChatInputCommand Handler

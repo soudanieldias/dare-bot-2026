@@ -6,7 +6,7 @@ import type { IDareClient } from '@/interfaces/index.js';
 export class OnClientReadyModule {
   constructor(private readonly client: IDareClient) {}
 
-  public bootstrap(): void {
+  public async bootstrap(): Promise<void> {
     this.client.once(Events.ClientReady, async (readyClient) => {
       this.printStatus(readyClient as IDareClient);
       // await DatabaseModule.populateServers(this.client);

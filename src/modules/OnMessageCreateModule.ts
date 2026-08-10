@@ -8,7 +8,7 @@ export class OnMessageCreateModule {
     this.client = client;
   }
 
-  public bootstrap(): void {
+  public async bootstrap(): Promise<void> {
     this.client.on(Events.MessageCreate, async (message: Message) => {
       try {
         if (message.author.bot) return;
