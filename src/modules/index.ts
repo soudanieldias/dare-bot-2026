@@ -4,6 +4,7 @@ export * from './AutocompleteModule.js';
 export * from './CommandLoaderModule.js';
 export * from './DatabaseModule.js';
 export * from './EmbedModule.js';
+export * from './ExpressModule.js';
 export * from './MusicModule.js';
 export * from './OnClientReadyModule.js';
 export * from './OnInteractionModule.js';

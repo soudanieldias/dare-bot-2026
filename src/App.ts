@@ -8,6 +8,7 @@ import {
   AutocompleteModule,
   CommandLoaderModule,
   DatabaseModule,
+  ExpressModule,
   MusicModule,
   OnClientReadyModule,
   OnInteractionModule,
@@ -93,5 +94,6 @@ export class App {
     await new AudioManagerModule(this.client).bootstrap();
     await new MusicModule(this.client).bootstrap();
     await new SoundpadModule(this.client).bootstrap();
+    await new ExpressModule(this.client).bootstrap();
   }
 }

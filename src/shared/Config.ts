@@ -22,6 +22,9 @@ export const config = {
   logging: {
     webhookUrl: process.env.LOG_WEBHOOK_URL ?? '',
   },
+  server: {
+    port: parseInt(process.env.SERVER_PORT ?? '3000', 10) || 3000,
+  },
   bot: {
     name: process.env.BOT_NAME ?? 'Dare Bot 2026',
     version: process.env.BOT_VERSION ?? 'v2.0.0',

@@ -45,6 +45,12 @@ export function getDiscordClient(): IDareClient {
     const client = new Client({ intents, partials }) as IDareClient;
     client.pads = new Map();
     client.commands = new Collection();
+    client.audioManager = {} as any;
+    client.musicModule = {} as any;
+    client.settings = {} as any;
+    client.soundpadModule = {} as any;
+    client.ticketModule = {} as any;
+    client.ttsModule = {} as any;
     instance = client;
   }
   return instance;

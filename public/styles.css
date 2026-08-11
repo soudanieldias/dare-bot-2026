@@ -1,0 +1,57 @@
+body {
+  font-family: Inter, system-ui, sans-serif;
+  margin: 0;
+  padding: 24px;
+  background: #0e0e17;
+  color: #e8e8f2;
+}
+
+h1,
+h2 {
+  color: #f8f8ff;
+}
+
+a {
+  color: #8be9fd;
+}
+
+p,
+li {
+  line-height: 1.6;
+}
+
+ol {
+  margin: 0 0 0 20px;
+}
+
+section {
+  background: #161628;
+  border: 1px solid #444;
+  padding: 16px;
+  margin: 16px 0;
+  border-radius: 12px;
+}
+
+footer {
+  margin-top: 24px;
+  color: #999;
+}
+
+code {
+  background: #12121d;
+  padding: 2px 6px;
+  border-radius: 4px;
+}
+
+.status-badge {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 999px;
+  background: #444;
+  color: #f8f8ff;
+  margin-left: 8px;
+}
+
+.error {
+  color: #ff6b6b;
+}

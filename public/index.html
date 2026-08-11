@@ -1,0 +1,23 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>DARE-BOT Status</title>
+    <link rel="stylesheet" href="/styles.css" />
+  </head>
+  <body>
+    <main>
+      <h1>DARE-BOT Status</h1>
+      <p>Servidor Express rodando na porta <strong id="server-port"></strong>.</p>
+      <p><a href="/api/status">Ver JSON</a></p>
+      <p>
+        Conexão WebSocket:
+        <span id="ws-status" class="status-badge">Aguardando...</span>
+      </p>
+      <div id="status-container"><p>Carregando status...</p></div>
+      <footer><p id="updated-at"></p></footer>
+    </main>
+    <script src="/app.js"></script>
+  </body>
+</html>
