@@ -3,6 +3,18 @@ const wsStatus = document.getElementById('ws-status');
 const updatedAt = document.getElementById('updated-at');
 const serverPort = document.getElementById('server-port');
 
+const queuePageSize = 10;
+const queuePages = new Map();
+let currentPayload = null;
+
+function getQueuePage(guildId, queueLength) {
+  const current = queuePages.get(guildId) || 1;
+  const total = Math.max(1, Math.ceil(queueLength / queuePageSize));
+  const page = Math.min(Math.max(current, 1), total);
+  queuePages.set(guildId, page);
+  return { page, total };
+}
+
 function renderGuild(guild) {
   const connected = guild.isConnected ? '✅ Conectado' : '❌ Desconectado';
   const channelText = guild.channelName
@@ -13,14 +25,20 @@ function renderGuild(guild) {
   const currentText = guild.currentTrack
     ? `<strong>Tocando agora:</strong> ${guild.currentTrack.name} (${guild.currentTrack.type})`
     : '<em>Não há nada tocando</em>';
+
+  const { page, total } = getQueuePage(guild.guildId, guild.queue.length);
+  const startIndex = (page - 1) * queuePageSize;
+  const pageItems = guild.queue.slice(startIndex, startIndex + queuePageSize);
   const queueText =
     guild.queue.length > 0
-      ? `<ol>${guild.queue
-          .slice(0, 10)
-          .map((item) => `<li>${item.name} (${item.type})</li>`)
-          .join('')}</ol>`
+      ? `<ul>${pageItems
+          .map((item, index) => `<li>${startIndex + index + 1}. ${item.name} (${item.type})</li>`)
+          .join('')}</ul>`
       : '<p>Fila vazia</p>';
-  const more = guild.queue.length > 10 ? `<p>... e mais ${guild.queue.length - 10} itens</p>` : '';
+  const summary =
+    guild.queue.length > 0
+      ? `<p class="queue-summary">Mostrando ${startIndex + 1}-${Math.min(startIndex + queuePageSize, guild.queue.length)} de ${guild.queue.length}</p>`
+      : '';
 
   return `
     <section>
@@ -32,7 +50,12 @@ function renderGuild(guild) {
       <div>
         <strong>Fila:</strong>
         ${queueText}
-        ${more}
+        ${summary}
+        <div class="queue-controls">
+          <button data-guild-id="${guild.guildId}" data-action="prev" ${page <= 1 ? 'disabled' : ''}>Anterior</button>
+          <span>Página ${page} de ${total}</span>
+          <button data-guild-id="${guild.guildId}" data-action="next" ${page >= total ? 'disabled' : ''}>Próxima</button>
+        </div>
       </div>
     </section>`;
 }
@@ -41,6 +64,7 @@ function updateStatus(message) {
   const payload = typeof message === 'string' ? JSON.parse(message) : message;
   if (!payload || payload.type !== 'status') return;
 
+  currentPayload = payload;
   serverPort.textContent = payload.server?.port ?? window.location.port;
 
   const list = payload.status;
@@ -79,5 +103,24 @@ function connect() {
     wsStatus.classList.add('error');
   });
 }
+
+document.addEventListener('click', (event) => {
+  const target = event.target;
+  if (!(target instanceof HTMLButtonElement)) return;
+  const guildId = target.dataset.guildId;
+  const action = target.dataset.action;
+  if (!guildId || !action) return;
+
+  const payload = currentPayload;
+  if (!payload) return;
+
+  const guild = payload.status.find((item) => item.guildId === guildId);
+  if (!guild) return;
+
+  const { page, total } = getQueuePage(guildId, guild.queue.length);
+  const nextPage = action === 'next' ? Math.min(total, page + 1) : Math.max(1, page - 1);
+  queuePages.set(guildId, nextPage);
+  updateStatus(JSON.stringify(payload));
+});
 
 connect();

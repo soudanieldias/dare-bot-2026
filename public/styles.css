@@ -52,6 +52,32 @@ code {
   margin-left: 8px;
 }
 
+.queue-summary {
+  margin: 12px 0 0;
+  color: #b3b3e6;
+}
+
+.queue-controls {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  margin-top: 10px;
+}
+
+.queue-controls button {
+  border: 0;
+  border-radius: 8px;
+  background: #6272a4;
+  color: #f8f8ff;
+  padding: 8px 14px;
+  cursor: pointer;
+}
+
+.queue-controls button:disabled {
+  background: #44475a;
+  cursor: not-allowed;
+}
+
 .error {
   color: #ff6b6b;
 }

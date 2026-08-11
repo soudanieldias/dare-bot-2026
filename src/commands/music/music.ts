@@ -3,6 +3,7 @@ import {
   PermissionFlagsBits,
   MessageFlags,
   GuildMember,
+  AttachmentBuilder,
   type Interaction,
 } from 'discord.js';
 import type { ICommand, IDareClient } from '@/interfaces/index.js';
@@ -155,21 +156,33 @@ export const musicCommand: ICommand = {
             });
             return;
           }
+
           const lines: string[] = [];
           if (current) {
             lines.push(`**Tocando agora:** ${current.name}`);
+            if (queue.length > 0) lines.push('');
           }
+
           if (queue.length > 0) {
-            lines.push(`\n**Fila (${queue.length}):**`);
-            queue.slice(0, 10).forEach((item, i) => {
+            lines.push(`**Fila completa (${queue.length}):**`);
+            queue.forEach((item, i) => {
               lines.push(`${i + 1}. ${item.name}`);
             });
-            if (queue.length > 10) {
-              lines.push(`... e mais ${queue.length - 10}`);
-            }
           }
+
+          const content = lines.join('\n');
+          if (content.length <= 1900) {
+            await interaction.reply({ content, flags: [MessageFlags.Ephemeral] });
+            return;
+          }
+
+          const queueFile = new AttachmentBuilder(Buffer.from(content, 'utf-8'), {
+            name: `queue-${guild.id}.txt`,
+          });
+
           await interaction.reply({
-            content: lines.join('\n') || 'Fila vazia.',
+            content: 'A fila está muito grande para exibir aqui. Veja o arquivo completo abaixo.',
+            files: [queueFile],
             flags: [MessageFlags.Ephemeral],
           });
           return;
