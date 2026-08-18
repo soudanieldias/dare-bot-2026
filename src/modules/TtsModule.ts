@@ -1,9 +1,6 @@
-import { createRequire } from 'node:module';
+import discordTTS from 'discord-tts';
 import { TTS_DEFAULT_LOCALE } from '@/constants/index.js';
 import type { IDareClient } from '@/interfaces/index.js';
-
-const require = createRequire(import.meta.url);
-const discordTTS = require('discord-tts');
 
 function localeToLang(locale: string): string {
   const lang = locale.split('-')[0];

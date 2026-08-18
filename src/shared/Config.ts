@@ -21,6 +21,8 @@ export const config = {
   },
   logging: {
     webhookUrl: process.env.LOG_WEBHOOK_URL ?? '',
+    preferredGuildId: process.env.LOG_GUILD_ID ?? '',
+    preferredChannelId: process.env.LOG_CHANNEL_ID ?? '',
   },
   server: {
     port: parseInt(process.env.SERVER_PORT ?? '3000', 10) || 3000,

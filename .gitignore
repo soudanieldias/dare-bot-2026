@@ -12,4 +12,5 @@ releases/
 *.wav
 *.wma
 *.wmv
-*.mp4
+*.mp4recordings/*
+!recordings/.gitkeep

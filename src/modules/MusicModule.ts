@@ -1,6 +1,6 @@
 import { readdir } from 'node:fs/promises';
 import path from 'node:path';
-import type { GuildMember } from 'discord.js';
+import { type GuildMember } from 'discord.js';
 import type { IConnectionParams, IDareClient } from '@/interfaces/index.js';
 import { logger } from '@/shared/index.js';
 
@@ -80,7 +80,7 @@ export class MusicModule {
     logger.info('Audio', 'MusicModule inicializado (playfile + jukebox).');
   }
 
-  async getNextMusicInQueue(guildId: string): Promise<IMusicQueueItem | undefined> {
+  public async getNextMusicInQueue(guildId: string): Promise<IMusicQueueItem | undefined> {
     const queue = this.queueMap.get(guildId);
     return Promise.resolve(queue?.[0]);
   }
@@ -172,7 +172,7 @@ export class MusicModule {
     }
   }
 
-  async play(
+  public async play(
     params: IConnectionParams,
     member: GuildMember,
     query: string,
@@ -213,7 +213,7 @@ export class MusicModule {
     };
   }
 
-  async playJukebox(
+  public async playJukebox(
     params: IConnectionParams,
     member: GuildMember,
     folderPath: string,
@@ -278,6 +278,28 @@ export class MusicModule {
     this.client.audioManager.skip(guildId);
   }
 
+  jumpTo(guildId: string, trackNumber: number): { message: string } {
+    const queue = this.queueMap.get(guildId);
+    if (!queue || queue.length === 0) {
+      throw new Error('Não há músicas na fila para pular.');
+    }
+
+    if (!Number.isInteger(trackNumber) || trackNumber < 1 || trackNumber > queue.length) {
+      throw new Error(`Número inválido. Informe um valor entre 1 e ${queue.length}.`);
+    }
+
+    const targetIndex = trackNumber - 1;
+    const target = queue[targetIndex]!;
+    const newQueue = queue.slice(targetIndex);
+    this.queueMap.set(guildId, newQueue);
+
+    this.skip(guildId);
+
+    return {
+      message: `⏭️ Pulando para: **${target.name}**`,
+    };
+  }
+
   pause(guildId: string): boolean {
     return this.client.audioManager.pause?.(guildId) ?? false;
   }
@@ -290,6 +312,15 @@ export class MusicModule {
     const current = this.currentTrackMap.get(guildId) ?? null;
     const queue = this.queueMap.get(guildId) ?? [];
     return { current, queue };
+  }
+
+  public async clearQueue(guildId: string): Promise<void> {
+    await this.queueMap.delete(guildId);
+    await this.currentTrackMap.delete(guildId);
+    await this.connectionParamsMap.delete(guildId);
+    await this.jukeboxStateMap.delete(guildId);
+    await this.client.audioManager.pause?.(guildId);
+    return;
   }
 
   setVolume(guildId: string, volume: number): void {

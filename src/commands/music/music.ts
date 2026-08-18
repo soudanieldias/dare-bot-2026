@@ -70,6 +70,19 @@ export const musicCommand: ICommand = {
               { name: 'Em ordem', value: 'ordered' }
             )
         )
+    )
+    .addSubcommand((sc) => sc.setName('clearqueue').setDescription('Limpa a fila de músicas'))
+    .addSubcommand((sc) =>
+      sc
+        .setName('jump')
+        .setDescription('Pula para uma música específica da fila')
+        .addIntegerOption((opt) =>
+          opt
+            .setName('track')
+            .setDescription('Número da faixa na fila (começando em 1)')
+            .setRequired(true)
+            .setMinValue(1)
+        )
     ) as ICommand['data'],
 
   category: 'music',
@@ -242,6 +255,30 @@ export const musicCommand: ICommand = {
             content: resumed
               ? '▶️ Música retomada.'
               : 'Não foi possível retomar a música no momento.',
+            flags: [MessageFlags.Ephemeral],
+          });
+          return;
+        }
+        case 'clearqueue': {
+          await client.musicModule.clearQueue(guild.id);
+          await interaction.reply({
+            content: 'Limpando a fila e mantendo conexão ativa.',
+            flags: [MessageFlags.Ephemeral],
+          });
+          return;
+        }
+        case 'jump': {
+          const trackNumber = interaction.options.getInteger('track', true);
+          const { message } = client.musicModule.jumpTo(guild.id, trackNumber);
+          await interaction.reply({
+            content: message,
+            flags: [MessageFlags.Ephemeral],
+          });
+          return;
+        }
+        default: {
+          await interaction.reply({
+            content: 'Subcomando inválido.',
             flags: [MessageFlags.Ephemeral],
           });
           return;

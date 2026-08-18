@@ -23,6 +23,8 @@ declare namespace NodeJS {
     NODE_ENV: 'development' | 'production' | 'test';
     DEBUG: 'true' | 'false';
     LOG_WEBHOOK_URL?: string;
+    LOG_GUILD_ID?: string;
+    LOG_CHANNEL_ID?: string;
 
     // Activity
     DEFAULT_ACTIVITY_TEXT: string;

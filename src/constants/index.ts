@@ -6,6 +6,8 @@ import type { ITicketCategory } from '@/interfaces/index.js';
 export const AUDIOS_DIR = 'src/audios';
 export const JUKEBOX_DIR = 'src/jukebox';
 export const JUKEBOX_ROOT = path.resolve(JUKEBOX_DIR);
+export const RECORDINGS_DIR = 'recordings';
+export const RECORDING_START_SOUND = path.join(AUDIOS_DIR, 'system', 'recording_start.mp3');
 
 // --- Soundpad ---
 
