@@ -1,5 +1,4 @@
-import { createWriteStream, existsSync, mkdirSync, type WriteStream } from 'node:fs';
-import path from 'node:path';
+import { existsSync, mkdirSync } from 'node:fs';
 import type { Readable } from 'node:stream';
 import {
   AudioPlayer,
@@ -7,32 +6,20 @@ import {
   AudioResource,
   createAudioPlayer,
   createAudioResource,
-  EndBehaviorType,
   getVoiceConnection,
   joinVoiceChannel,
   VoiceConnection,
   VoiceConnectionStatus,
 } from '@discordjs/voice';
-import prism from 'prism-media';
 import { RECORDING_START_SOUND, RECORDINGS_DIR } from '@/constants/index.js';
 import { type IDareClient } from '@/interfaces/index.js';
 import { logger, config } from '@/shared/index.js';
+import { CallRecordingSession } from '@/utils/callRecording.js';
 
 interface AudioQueueItem {
   source: string;
   name: string;
   type: 'MUSIC' | 'EFFECT';
-}
-
-interface ActiveUserRecording {
-  opusStream: Readable;
-  decoder: prism.opus.Decoder;
-  writeStream: WriteStream;
-}
-
-interface GuildRecordingSession {
-  speakingHandler: (userId: string) => void;
-  userRecordings: Map<string, ActiveUserRecording>;
 }
 
 export type MusicOnIdleCallback = (guildId: string) => void;
@@ -43,7 +30,7 @@ export class AudioManagerModule {
   private queueMap = new Map<string, AudioQueueItem[]>();
   private volumeMap = new Map<string, number>();
   private resourceMap = new Map<string, AudioResource>();
-  private recordingMap = new Map<string, GuildRecordingSession>();
+  private recordingMap = new Map<string, CallRecordingSession>();
   private musicOnIdleCallback?: MusicOnIdleCallback;
 
   constructor(private readonly client: IDareClient) {
@@ -340,68 +327,19 @@ export class AudioManagerModule {
       );
     }
 
-    const userRecordings = new Map<string, ActiveUserRecording>();
-
-    const speakingHandler = (userId: string) => {
-      if (userRecordings.has(userId)) return;
-
-      const opusStream = connection.receiver.subscribe(userId, {
-        end: {
-          behavior: EndBehaviorType.AfterSilence,
-          duration: 1000,
-        },
-      });
-
-      const decoder = new prism.opus.Decoder({
-        frameSize: 960,
-        channels: 2,
-        rate: 48000,
-      });
-
-      const filename = path.join(RECORDINGS_DIR, `${guildId}-${userId}-${Date.now()}.pcm`);
-      const writeStream = createWriteStream(filename);
-
-      opusStream.pipe(decoder).pipe(writeStream);
-
-      const active: ActiveUserRecording = { opusStream, decoder, writeStream };
-      userRecordings.set(userId, active);
-
-      const cleanupUser = () => {
-        if (!userRecordings.has(userId)) return;
-        userRecordings.delete(userId);
-        try {
-          opusStream.destroy();
-        } catch {
-          // ignore
-        }
-        try {
-          decoder.destroy();
-        } catch {
-          // ignore
-        }
-        if (!writeStream.closed) {
-          writeStream.end();
-        }
-        logger.info('Audio', `Gravação finalizada para user ${userId}: ${filename}`);
-      };
-
-      opusStream.on('end', cleanupUser);
-      opusStream.on('close', cleanupUser);
-      opusStream.on('error', (err) => {
-        logger.error('Audio', `Erro no stream de ${userId}: ${err.message}`);
-        cleanupUser();
-      });
-
-      logger.info('Audio', `Gravando user ${userId} → ${filename}`);
-    };
-
-    connection.receiver.speaking.on('start', speakingHandler);
-    this.recordingMap.set(guildId, { speakingHandler, userRecordings });
+    const session = new CallRecordingSession(
+      connection,
+      guildId,
+      RECORDINGS_DIR,
+      this.client.user?.id
+    );
+    session.start(channelId, this.client);
+    this.recordingMap.set(guildId, session);
 
     logger.info('Audio', `Gravação de call iniciada na guilda ${guildId}.`);
     return {
       started: true,
-      message: `🎙️ Gravação iniciada. Arquivos em \`${RECORDINGS_DIR}/\`.`,
+      message: `🎙️ Gravação contínua iniciada. Um PCM por usuário em \`${RECORDINGS_DIR}/\`.`,
     };
   }
 
@@ -411,28 +349,7 @@ export class AudioManagerModule {
       return { stopped: false, message: 'Não há gravação ativa neste servidor.' };
     }
 
-    const connection = this.getConnection(guildId);
-    if (connection) {
-      connection.receiver.speaking.off('start', session.speakingHandler);
-    }
-
-    for (const [userId, rec] of session.userRecordings) {
-      try {
-        rec.opusStream.destroy();
-      } catch {
-        // ignore
-      }
-      try {
-        rec.decoder.destroy();
-      } catch {
-        // ignore
-      }
-      if (!rec.writeStream.closed) {
-        rec.writeStream.end();
-      }
-      session.userRecordings.delete(userId);
-    }
-
+    session.stop();
     this.recordingMap.delete(guildId);
     logger.info('Audio', `Gravação de call parada na guilda ${guildId}.`);
     return {

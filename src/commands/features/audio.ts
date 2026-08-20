@@ -15,7 +15,7 @@ export const audioCommand: ICommand = {
     .addSubcommand((sc) =>
       sc
         .setName('recordcall')
-        .setDescription('Inicia a gravação da call (PCM por usuário em /recordings)')
+        .setDescription('Inicia gravação contínua da call (um PCM por usuário, alinhados no tempo)')
     )
     .addSubcommand((sc) =>
       sc.setName('stoprecord').setDescription('Para a gravação da call')
